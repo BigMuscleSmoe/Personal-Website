@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Photos — Steven Zhang</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <nav class="nav">
+    <a class="nav-logo" href="index.html" data-cursor="Home">SZ</a>
+    <div class="nav-links">
+      <a class="nav-link" href="work.html" data-cursor="Work">Work</a>
+      <a class="nav-link" href="experience.html" data-cursor="Experience">Experience</a>
+      <a class="nav-link" href="about.html" data-cursor="About">About</a>
+      <a class="nav-link" href="photos.html" data-cursor="Photos">Photos</a>
+      <a class="nav-link" href="contact.html" data-cursor="Contact">Contact</a>
+    </div>
+  </nav>
+
+  <main class="page-inner">
+
+    <!-- Albums view -->
+    <section id="albums-view">
+      <section class="lamp-hero">
+        <div class="lamp-fx" aria-hidden="true">
+          <div class="lamp-cone lamp-cone-l"></div>
+          <div class="lamp-cone lamp-cone-r"></div>
+          <div class="lamp-glow"></div>
+          <div class="lamp-hotspot"></div>
+          <div class="lamp-bar"></div>
+        </div>
+        <h2 class="lamp-title">Photos</h2>
+        <span class="lamp-sub" id="album-count"></span>
+      </section>
+      <div class="album-grid" id="album-grid"></div>
+    </section>
+
+    <!-- Viewer view (hidden initially) -->
+    <section id="viewer-view" style="display: none;">
+      <a class="viewer-back" href="#" id="back-to-albums" data-cursor="Back">
+        <svg width="8" height="13" viewBox="0 0 8 13" fill="none" aria-hidden="true">
+          <path d="M7 1L1 6.5 7 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Albums
+      </a>
+      <div class="page-header">
+        <h2 class="page-title" id="viewer-title"></h2>
+        <span class="page-count" id="viewer-counter"></span>
+      </div>
+      <div class="viewer-stage">
+        <img class="viewer-img" id="viewer-img" alt="" />
+      </div>
+      <div class="viewer-controls">
+        <button class="viewer-arrow" id="viewer-prev" data-cursor="Prev" aria-label="Previous photo">
+          <svg width="10" height="16" viewBox="0 0 10 16" fill="none">
+            <path d="M8 1L2 8l6 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <span class="viewer-counter" id="viewer-counter-2"></span>
+        <button class="viewer-arrow" id="viewer-next" data-cursor="Next" aria-label="Next photo">
+          <svg width="10" height="16" viewBox="0 0 10 16" fill="none">
+            <path d="M2 1l6 7-6 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+    </section>
+
+    <footer class="page-footer">
+      <span class="footer-copy">© <span id="year"></span> Steven Zhang</span>
+      <a class="footer-copy" href="index.html" data-cursor="Home" style="text-decoration: none;">← Home</a>
+    </footer>
+  </main>
+
+  <script src="script.js"></script>
+  <script src="photos.js"></script>
+</body>
+</html>

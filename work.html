@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Work — Steven Zhang</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <nav class="nav">
+    <a class="nav-logo" href="index.html" data-cursor="Home">SZ</a>
+    <div class="nav-links">
+      <a class="nav-link" href="work.html" data-cursor="Work">Work</a>
+      <a class="nav-link" href="experience.html" data-cursor="Experience">Experience</a>
+      <a class="nav-link" href="about.html" data-cursor="About">About</a>
+      <a class="nav-link" href="photos.html" data-cursor="Photos">Photos</a>
+      <a class="nav-link" href="contact.html" data-cursor="Contact">Contact</a>
+    </div>
+  </nav>
+
+  <main class="page-inner">
+    <section class="lamp-hero">
+      <div class="lamp-fx" aria-hidden="true">
+        <div class="lamp-cone lamp-cone-l"></div>
+        <div class="lamp-cone lamp-cone-r"></div>
+        <div class="lamp-glow"></div>
+        <div class="lamp-hotspot"></div>
+        <div class="lamp-bar"></div>
+      </div>
+      <h2 class="lamp-title">Work</h2>
+      <span class="lamp-sub">3 projects</span>
+    </section>
+
+    <div class="work-list">
+      <a class="work-item reveal" href="#" data-cursor="View">
+        <div class="work-num">01</div>
+        <div class="work-body">
+          <div class="work-title">TCP/IP Client-Server List Manager</div>
+          <div class="work-expand">Python client/server app using TCP sockets and JSON request/response for list operations — with validation, logging, and persistent storage.</div>
+        </div>
+        <div class="work-tags">
+          <span class="work-tag">Python</span>
+          <span class="work-tag">TCP/IP</span>
+          <span class="work-tag">JSON</span>
+        </div>
+        <div class="work-arrow">↗</div>
+      </a>
+
+      <a class="work-item reveal d1" href="#" data-cursor="View">
+        <div class="work-num">02</div>
+        <div class="work-body">
+          <div class="work-title">Personal Portfolio Website</div>
+          <div class="work-expand">Responsive HTML / CSS / JS portfolio with premium motion — loader, scroll reveals, magnetic cursor, and editorial typography.</div>
+        </div>
+        <div class="work-tags">
+          <span class="work-tag">HTML</span>
+          <span class="work-tag">CSS</span>
+          <span class="work-tag">Motion</span>
+        </div>
+        <div class="work-arrow">↗</div>
+      </a>
+
+      <a class="work-item reveal d2" href="#" data-cursor="View">
+        <div class="work-num">03</div>
+        <div class="work-body">
+          <div class="work-title">CTF &amp; Cybersecurity Club</div>
+          <div class="work-expand">Hands-on security work in simulated environments: vulnerability assessment, basic penetration testing, and CTF problem-solving.</div>
+        </div>
+        <div class="work-tags">
+          <span class="work-tag">CTF</span>
+          <span class="work-tag">Pentest</span>
+          <span class="work-tag">Linux</span>
+        </div>
+        <div class="work-arrow">↗</div>
+      </a>
+    </div>
+
+    <footer class="page-footer">
+      <span class="footer-copy">© <span id="year"></span> Steven Zhang</span>
+      <a class="footer-copy" href="index.html" data-cursor="Home" style="text-decoration: none;">← Home</a>
+    </footer>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

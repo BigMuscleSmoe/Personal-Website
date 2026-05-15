@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Steven Zhang — Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- Animated background -->
+  <canvas id="bg-canvas" aria-hidden="true"></canvas>
+
+  <!-- Loader (home only) -->
+  <div class="loader" id="loader">
+    <div class="loader-count" id="loader-count">00</div>
+    <div class="loader-label">Loading portfolio</div>
+    <div class="loader-bar-track"><div class="loader-bar-fill" id="loader-bar"></div></div>
+  </div>
+
+  <!-- Nav -->
+  <nav class="nav">
+    <a class="nav-logo" href="index.html" data-cursor="Home">SZ</a>
+    <div class="nav-links">
+      <a class="nav-link" href="work.html" data-cursor="Work">Work</a>
+      <a class="nav-link" href="experience.html" data-cursor="Experience">Experience</a>
+      <a class="nav-link" href="about.html" data-cursor="About">About</a>
+      <a class="nav-link" href="photos.html" data-cursor="Photos">Photos</a>
+      <a class="nav-link" href="contact.html" data-cursor="Contact">Contact</a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <main class="home">
+    <section class="home-hero">
+      <div class="hero-eyebrow fade-up">CSE &amp; Math · The Ohio State University</div>
+
+      <h1 class="hero-name">
+        <span class="line name-first"><span class="reveal-wrap"><span class="reveal-inner d1">STEVEN</span></span></span>
+        <span class="line name-last"><span class="reveal-wrap"><span class="reveal-inner d2">ZHANG</span></span></span>
+      </h1>
+
+      <div class="hero-bottom">
+        <p class="hero-desc fade-up d4">
+          CS senior at Ohio State. Security, networking, full-stack. Currently a TA for Java OOP. Always looking for the next problem to solve.
+        </p>
+        <div class="hero-meta fade-up d5">
+          <span class="chip chip-avail">
+            <span class="avail-dot"></span>
+            Open to Spring 2026
+          </span>
+          <span class="chip">Security</span>
+          <span class="chip">Networking</span>
+          <span class="chip">Full-Stack</span>
+        </div>
+      </div>
+    </section>
+
+    <div class="home-divider"></div>
+  </main>
+
+  <script src="bg.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
