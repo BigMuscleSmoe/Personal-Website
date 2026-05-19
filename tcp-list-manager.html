@@ -1,0 +1,586 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TCP List Manager — Steven Zhang</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* ── Project overview ────────────────────────────── */
+    .proj-desc {
+      font-size: clamp(18px, 2.4vw, 22px);
+      line-height: 1.75;
+      color: #e0e0e0 !important;
+      max-width: 62ch;
+      margin-bottom: 36px;
+      position: relative;
+      z-index: 10;
+    }
+    .proj-desc strong { color: #fff !important; font-weight: 600; }
+
+    .proj-links {
+      display: flex; gap: 12px; flex-wrap: wrap;
+      margin-bottom: 48px;
+    }
+    .proj-link {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: var(--mono); font-size: 11px;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      padding: 10px 20px; border-radius: 999px;
+      border: 1px solid rgba(0,212,255,0.25);
+      background: rgba(0,212,255,0.07);
+      color: var(--accent2);
+      transition: background 0.2s, border-color 0.2s, color 0.2s;
+      text-decoration: none;
+    }
+    .proj-link:hover {
+      background: rgba(0,212,255,0.15);
+      border-color: rgba(0,212,255,0.45);
+      color: #fff;
+    }
+
+    .proj-concepts {
+      display: flex; flex-wrap: wrap; gap: 10px;
+      margin-bottom: 56px;
+    }
+    .proj-chip {
+      font-family: var(--mono); font-size: 10.5px;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      padding: 6px 16px; border-radius: 8px;
+      border: 1px solid rgba(124,92,255,0.3);
+      background: rgba(124,92,255,0.1);
+      color: rgba(160,140,255,0.95);
+    }
+
+    /* ── Section headers ─────────────────────────────── */
+    .section-label {
+      font-family: var(--mono); font-size: 10px;
+      letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--accent2);
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 700; letter-spacing: -0.03em;
+      margin-bottom: 24px;
+    }
+
+    /* ── Terminal demo ───────────────────────────────── */
+    .demo-wrap {
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      overflow: hidden;
+      background: #0c0c10;
+      margin-bottom: 24px;
+    }
+    .demo-panels {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 420px;
+    }
+    .demo-panel {
+      display: flex; flex-direction: column;
+    }
+    .demo-panel + .demo-panel {
+      border-left: 1px solid var(--border);
+    }
+    .demo-panel-head {
+      display: flex; align-items: center; gap: 8px;
+      padding: 12px 18px;
+      background: rgba(255,255,255,0.03);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .demo-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+    }
+    .demo-dot-r { background: #ff5f56; }
+    .demo-dot-y { background: #ffbd2e; }
+    .demo-dot-g { background: #27c93f; }
+    .demo-panel-label {
+      font-family: var(--mono); font-size: 11px;
+      color: rgba(255,255,255,0.55);
+      letter-spacing: 0.04em;
+      margin-left: 8px;
+    }
+    .demo-output {
+      flex: 1;
+      padding: 16px 18px;
+      overflow-y: auto;
+      font-family: var(--mono);
+      font-size: 12.5px;
+      line-height: 1.7;
+      color: rgba(255,255,255,0.7);
+      max-height: 380px;
+    }
+    .demo-output .line-cmd { color: var(--accent2); }
+    .demo-output .line-ok { color: #22dd55; }
+    .demo-output .line-warn { color: #ffbd2e; }
+    .demo-output .line-err { color: #ff5f56; }
+    .demo-output .line-info { color: rgba(255,255,255,0.45); }
+    .demo-output .line-show { color: var(--accent); }
+    .demo-output .line-json { color: rgba(255,255,255,0.6); }
+
+    /* ── Input bar ───────────────────────────────────── */
+    .demo-input-bar {
+      display: flex; gap: 0;
+      border-top: 1px solid var(--border);
+    }
+    .demo-prompt {
+      font-family: var(--mono); font-size: 13px;
+      color: var(--accent2);
+      padding: 14px 0 14px 18px;
+      user-select: none;
+    }
+    .demo-input {
+      flex: 1;
+      background: transparent;
+      border: none; outline: none;
+      font-family: var(--mono); font-size: 13px;
+      color: var(--fg);
+      padding: 14px 18px 14px 8px;
+    }
+    .demo-input::placeholder { color: rgba(255,255,255,0.2); }
+
+    /* ── Quick commands ──────────────────────────────── */
+    .demo-quick {
+      display: flex; flex-wrap: wrap; gap: 8px;
+      margin-bottom: 32px;
+    }
+    .demo-qbtn {
+      font-family: var(--mono); font-size: 10.5px;
+      letter-spacing: 0.04em;
+      padding: 7px 14px; border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: rgba(255,255,255,0.7);
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s, background 0.2s;
+    }
+    .demo-qbtn:hover {
+      border-color: rgba(255,255,255,0.25);
+      color: var(--fg);
+      background: var(--surface-hi);
+    }
+
+    /* ── How it works note ───────────────────────────── */
+    .demo-note {
+      padding: 20px 24px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--surface);
+      margin-bottom: 48px;
+    }
+    .demo-note-title {
+      font-family: var(--mono); font-size: 10px;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--accent2);
+      margin-bottom: 10px;
+    }
+    .demo-note p {
+      font-size: 14px;
+      line-height: 1.7;
+      color: rgba(255,255,255,0.7);
+      margin: 0;
+    }
+
+    /* ── Command ref table ───────────────────────────── */
+    .cmd-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 48px;
+    }
+    .cmd-card {
+      padding: 16px 20px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--surface);
+    }
+    .cmd-name {
+      font-family: var(--mono); font-size: 13px;
+      font-weight: 500;
+      color: var(--accent2);
+      margin-bottom: 4px;
+    }
+    .cmd-desc {
+      font-size: 13px;
+      color: rgba(255,255,255,0.6);
+    }
+
+    @media (max-width: 760px) {
+      .demo-panels { grid-template-columns: 1fr; }
+      .demo-panel + .demo-panel { border-left: none; border-top: 1px solid var(--border); }
+      .cmd-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="nav">
+    <a class="nav-logo" href="index.html" data-cursor="Home">SZ</a>
+    <div class="nav-links">
+      <a class="nav-link" href="work.html" data-cursor="Work">Work</a>
+      <a class="nav-link" href="experience.html" data-cursor="Experience">Experience</a>
+      <a class="nav-link" href="about.html" data-cursor="About">About</a>
+      <a class="nav-link" href="photos.html" data-cursor="Photos">Photos</a>
+      <a class="nav-link" href="contact.html" data-cursor="Contact">Contact</a>
+    </div>
+  </nav>
+
+  <main class="page-inner">
+
+    <!-- Hero -->
+    <section class="lamp-hero">
+      <div class="lamp-fx" aria-hidden="true">
+        <div class="lamp-cone lamp-cone-l"></div>
+        <div class="lamp-cone lamp-cone-r"></div>
+        <div class="lamp-glow"></div>
+        <div class="lamp-hotspot"></div>
+        <div class="lamp-bar"></div>
+      </div>
+      <h2 class="lamp-title">TCP List Manager</h2>
+      <span class="lamp-sub">CSE 3421 · Intro to Computer Networking</span>
+    </section>
+
+    <!-- Project Overview -->
+    <section>
+      <div class="section-label">Overview</div>
+      <p class="proj-desc">
+        A <strong>Python TCP client-server application</strong> that manages named lists over a persistent socket connection using a <strong>JSON-based protocol</strong>. The client validates input locally before transmitting commands; the server processes them, maintains state in memory, and persists active lists to disk on shutdown. Built for <strong>CSE 3421</strong> at Ohio State.
+      </p>
+
+      <div class="proj-links">
+        <a class="proj-link" href="https://github.com/BigMuscleSmoe/tcp-list-manager" target="_blank" rel="noopener" data-cursor="GitHub">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          <span>View on GitHub</span>
+        </a>
+      </div>
+
+      <div class="proj-concepts">
+        <span class="proj-chip">TCP Sockets</span>
+        <span class="proj-chip">JSON Protocol</span>
+        <span class="proj-chip">Client-Side Validation</span>
+        <span class="proj-chip">Server State Management</span>
+        <span class="proj-chip">Disk Persistence</span>
+        <span class="proj-chip">Python</span>
+      </div>
+    </section>
+
+    <!-- Command Reference -->
+    <section>
+      <div class="section-label">Commands</div>
+      <div class="cmd-grid">
+        <div class="cmd-card">
+          <div class="cmd-name">CREATE &lt;name&gt;</div>
+          <div class="cmd-desc">Create a new named list</div>
+        </div>
+        <div class="cmd-card">
+          <div class="cmd-name">ADD &lt;item&gt;</div>
+          <div class="cmd-desc">Add item to the active list</div>
+        </div>
+        <div class="cmd-card">
+          <div class="cmd-name">REMOVE &lt;item&gt;</div>
+          <div class="cmd-desc">Remove item from the active list</div>
+        </div>
+        <div class="cmd-card">
+          <div class="cmd-name">DELETE &lt;name&gt;</div>
+          <div class="cmd-desc">Delete an entire list</div>
+        </div>
+        <div class="cmd-card">
+          <div class="cmd-name">SHOW</div>
+          <div class="cmd-desc">Display items in the active list</div>
+        </div>
+        <div class="cmd-card">
+          <div class="cmd-name">HELP</div>
+          <div class="cmd-desc">Show available commands</div>
+        </div>
+        <div class="cmd-card">
+          <div class="cmd-name">QUIT</div>
+          <div class="cmd-desc">Save state and shut down</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Interactive Demo -->
+    <section>
+      <div class="section-label">Interactive Demo</div>
+      <h3 class="section-title">Try it in the browser</h3>
+
+      <div class="demo-quick" id="quick-btns">
+        <button class="demo-qbtn" data-cmd="create groceries">create groceries</button>
+        <button class="demo-qbtn" data-cmd="add milk">add milk</button>
+        <button class="demo-qbtn" data-cmd="add eggs">add eggs</button>
+        <button class="demo-qbtn" data-cmd="show">show</button>
+        <button class="demo-qbtn" data-cmd="remove milk">remove milk</button>
+        <button class="demo-qbtn" data-cmd="delete groceries">delete groceries</button>
+        <button class="demo-qbtn" data-cmd="help">help</button>
+      </div>
+
+      <div class="demo-wrap">
+        <div class="demo-panels">
+          <div class="demo-panel">
+            <div class="demo-panel-head">
+              <span class="demo-dot demo-dot-r"></span>
+              <span class="demo-dot demo-dot-y"></span>
+              <span class="demo-dot demo-dot-g"></span>
+              <span class="demo-panel-label">Client — p3c.py</span>
+            </div>
+            <div class="demo-output" id="client-out">
+              <div class="line-info">Connected to server 127.0.0.1:7188</div>
+            </div>
+          </div>
+          <div class="demo-panel">
+            <div class="demo-panel-head">
+              <span class="demo-dot demo-dot-r"></span>
+              <span class="demo-dot demo-dot-y"></span>
+              <span class="demo-dot demo-dot-g"></span>
+              <span class="demo-panel-label">Server — p3s.py</span>
+            </div>
+            <div class="demo-output" id="server-out">
+              <div class="line-info">Server listening on 127.0.0.1:7188</div>
+              <div class="line-info">Accepted connection from 127.0.0.1</div>
+            </div>
+          </div>
+        </div>
+        <div class="demo-input-bar">
+          <span class="demo-prompt">›</span>
+          <input class="demo-input" id="demo-input" type="text" placeholder="Type a command (e.g. create groceries)" autocomplete="off" spellcheck="false" />
+        </div>
+      </div>
+
+      <div class="demo-note">
+        <div class="demo-note-title">How it works</div>
+        <p>The real version uses <strong style="color:var(--fg)">TCP sockets</strong> for communication between two separate Python processes. This browser demo simulates the same JSON request/response protocol entirely in JavaScript — same validation rules, same error handling, same server logic. No network involved.</p>
+      </div>
+    </section>
+
+    <footer class="page-footer">
+      <span class="footer-copy">© <span id="year"></span> Steven Zhang</span>
+      <a class="footer-copy" href="work.html" data-cursor="Work" style="text-decoration: none;">← Work</a>
+    </footer>
+  </main>
+
+  <script src="script.js"></script>
+  <script>
+  (function() {
+    // ── Server state ──────────────────────────────────
+    var lists = {};
+    var currentList = null;
+
+    var clientOut = document.getElementById('client-out');
+    var serverOut = document.getElementById('server-out');
+    var input = document.getElementById('demo-input');
+
+    var VALID_COMMANDS = ['ADD','CREATE','DELETE','HELP','QUIT','REMOVE','SHOW'];
+    var NEED_PARAM = ['ADD','CREATE','DELETE','REMOVE'];
+
+    var USAGE = [
+      'add <item>         - Add list item',
+      'create <list name> - Create list',
+      'delete <list name> - Delete list',
+      'help               - Help',
+      'quit               - Quit',
+      'remove <item>      - Remove list item',
+      'show               - Show items'
+    ];
+
+    function addLine(el, text, cls) {
+      var d = document.createElement('div');
+      if (cls) d.className = cls;
+      d.textContent = text;
+      el.appendChild(d);
+      el.scrollTop = el.scrollHeight;
+    }
+
+    function processCommand(raw) {
+      raw = raw.trim();
+      if (!raw) {
+        addLine(clientOut, 'Error: No command entered.', 'line-err');
+        return;
+      }
+
+      var tokens = raw.split(/\s+/);
+      var command = tokens[0].toUpperCase();
+      var parameter = tokens.slice(1).join(' ');
+
+      // Client-side: show what user typed
+      addLine(clientOut, '> ' + raw, 'line-cmd');
+
+      // Client-side validation
+      if (command === 'SHUTDOWN') {
+        addLine(clientOut, 'Command error: SHUTDOWN is an invalid command', 'line-err');
+        return;
+      }
+
+      if (VALID_COMMANDS.indexOf(command) === -1) {
+        addLine(clientOut, 'Invalid command: ' + command, 'line-err');
+        USAGE.forEach(function(l) { addLine(clientOut, '  ' + l, 'line-info'); });
+        return;
+      }
+
+      if (NEED_PARAM.indexOf(command) !== -1 && !parameter) {
+        addLine(clientOut, 'Missing element in command: ' + command, 'line-err');
+        USAGE.forEach(function(l) { addLine(clientOut, '  ' + l, 'line-info'); });
+        return;
+      }
+
+      if (command === 'HELP') {
+        addLine(clientOut, 'usage:', 'line-info');
+        USAGE.forEach(function(l) { addLine(clientOut, '  ' + l, 'line-info'); });
+        return;
+      }
+
+      // ── Send to "server" ──────────────────────────
+      var request = { command: command, parameter: parameter };
+      addLine(serverOut, '← ' + JSON.stringify(request), 'line-json');
+
+      var response = { response: '', parameter: '' };
+
+      if (command === 'CREATE') {
+        if (!parameter) {
+          response.response = 'ERROR';
+          response.parameter = 'Missing list name for CREATE.';
+        } else if (lists[parameter]) {
+          response.response = 'WARNING';
+          response.parameter = "List '" + parameter + "' already exists. You cannot create a duplicate.";
+        } else if (currentList) {
+          response.response = 'ERROR';
+          response.parameter = "List '" + currentList + "' is currently active. DELETE it before creating a new one.";
+        } else {
+          lists[parameter] = [];
+          currentList = parameter;
+          response.response = 'CREATE';
+          response.parameter = "List '" + parameter + "' created and selected.";
+        }
+      }
+
+      else if (command === 'ADD') {
+        if (!currentList) {
+          response.response = 'ERROR';
+          response.parameter = 'No list selected. Use CREATE first.';
+        } else if (!parameter) {
+          response.response = 'ERROR';
+          response.parameter = 'Missing item to ADD.';
+        } else if (lists[currentList].indexOf(parameter) !== -1) {
+          response.response = 'WARNING';
+          response.parameter = "'" + parameter + "' already exists in list.";
+        } else {
+          lists[currentList].push(parameter);
+          response.response = 'ADD';
+          response.parameter = "'" + parameter + "' added to list '" + currentList + "'.";
+        }
+      }
+
+      else if (command === 'REMOVE') {
+        if (!currentList) {
+          response.response = 'ERROR';
+          response.parameter = 'No list selected.';
+        } else if (!parameter) {
+          response.response = 'ERROR';
+          response.parameter = 'Missing item to REMOVE.';
+        } else {
+          var idx = lists[currentList].indexOf(parameter);
+          if (idx === -1) {
+            response.response = 'WARNING';
+            response.parameter = "'" + parameter + "' not found in list.";
+          } else {
+            lists[currentList].splice(idx, 1);
+            response.response = 'REMOVE';
+            response.parameter = "'" + parameter + "' removed from list.";
+          }
+        }
+      }
+
+      else if (command === 'DELETE') {
+        if (!parameter) {
+          response.response = 'ERROR';
+          response.parameter = 'Missing list name for DELETE.';
+        } else if (!lists[parameter]) {
+          response.response = 'WARNING';
+          response.parameter = "List '" + parameter + "' does not exist.";
+        } else {
+          delete lists[parameter];
+          if (currentList === parameter) currentList = null;
+          response.response = 'DELETE';
+          response.parameter = "List '" + parameter + "' deleted.";
+        }
+      }
+
+      else if (command === 'SHOW') {
+        if (!currentList) {
+          response.response = 'ERROR';
+          response.parameter = 'No list selected.';
+        } else if (lists[currentList].length === 0) {
+          response.response = 'SHOW';
+          response.parameter = '(list is empty)';
+        } else {
+          response.response = 'SHOW';
+          response.parameter = lists[currentList].join('; ');
+        }
+      }
+
+      else if (command === 'QUIT') {
+        response.response = 'SHUTDOWN';
+        response.parameter = 'Server shutting down.';
+      }
+
+      else {
+        response.response = 'ERROR';
+        response.parameter = 'Unsupported command: ' + command;
+      }
+
+      // Server log: show outgoing response
+      addLine(serverOut, '→ ' + JSON.stringify(response), 'line-json');
+
+      // ── Client handles response ───────────────────
+      var type = response.response;
+      var param = response.parameter;
+
+      if (type === 'SHOW') {
+        addLine(clientOut, 'List Items:', 'line-show');
+        var items = param.split(';');
+        items.forEach(function(item, i) {
+          addLine(clientOut, '  ' + (i + 1) + '. ' + item.trim(), 'line-show');
+        });
+      } else if (type === 'WARNING') {
+        addLine(clientOut, 'WARNING: ' + param, 'line-warn');
+      } else if (type === 'ERROR') {
+        addLine(clientOut, 'ERROR: ' + param, 'line-err');
+      } else if (type === 'SHUTDOWN') {
+        addLine(clientOut, 'Server requested shutdown. Closing client.', 'line-info');
+        addLine(serverOut, 'Server shut down.', 'line-info');
+        // Reset state
+        lists = {};
+        currentList = null;
+        setTimeout(function() {
+          addLine(serverOut, 'Server listening on 127.0.0.1:7188', 'line-info');
+          addLine(serverOut, 'Accepted connection from 127.0.0.1', 'line-info');
+          addLine(clientOut, 'Connected to server 127.0.0.1:7188', 'line-info');
+        }, 600);
+      } else {
+        addLine(clientOut, param, 'line-ok');
+      }
+    }
+
+    // ── Input handling ────────────────────────────────
+    input.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        processCommand(input.value);
+        input.value = '';
+      }
+    });
+
+    // ── Quick command buttons ─────────────────────────
+    document.getElementById('quick-btns').addEventListener('click', function(e) {
+      var btn = e.target.closest('[data-cmd]');
+      if (!btn) return;
+      processCommand(btn.getAttribute('data-cmd'));
+      input.focus();
+    });
+  })();
+  </script>
+</body>
+</html>
