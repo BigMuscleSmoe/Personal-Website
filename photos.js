@@ -11,7 +11,7 @@ const ALBUMS = [
   {
     id: 'china',
     name: 'China',
-    photos: ['photos/content.png'],
+    photos: ['photos/china1.jpg'],
   },
   {
     id: 'pittsburgh',
