@@ -1,0 +1,939 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Core Language Interpreter — Steven Zhang</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* ── Project overview ────────────────────────────── */
+    .proj-desc {
+      font-size: clamp(18px, 2.4vw, 22px);
+      line-height: 1.75;
+      color: #e0e0e0 !important;
+      max-width: 62ch;
+      margin-bottom: 36px;
+      position: relative;
+      z-index: 10;
+    }
+    .proj-desc strong { color: #fff !important; font-weight: 600; }
+
+    .proj-links {
+      display: flex; gap: 12px; flex-wrap: wrap;
+      margin-bottom: 48px;
+    }
+    .proj-link {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: var(--mono); font-size: 11px;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      padding: 10px 20px; border-radius: 999px;
+      border: 1px solid rgba(0,212,255,0.25);
+      background: rgba(0,212,255,0.07);
+      color: var(--accent2);
+      transition: background 0.2s, border-color 0.2s, color 0.2s;
+      text-decoration: none;
+    }
+    .proj-link:hover {
+      background: rgba(0,212,255,0.15);
+      border-color: rgba(0,212,255,0.45);
+      color: #fff;
+    }
+
+    .proj-concepts {
+      display: flex; flex-wrap: wrap; gap: 10px;
+      margin-bottom: 56px;
+    }
+    .proj-chip {
+      font-family: var(--mono); font-size: 10.5px;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      padding: 6px 16px; border-radius: 8px;
+      border: 1px solid rgba(124,92,255,0.3);
+      background: rgba(124,92,255,0.1);
+      color: rgba(160,140,255,0.95);
+    }
+
+    /* ── Section headers ─────────────────────────────── */
+    .section-label {
+      font-family: var(--mono); font-size: 10px;
+      letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--accent2);
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 700; letter-spacing: -0.03em;
+      margin-bottom: 24px;
+    }
+
+    /* ── Pipeline diagram ────────────────────────────── */
+    .pipeline {
+      display: flex; align-items: center; gap: 0;
+      flex-wrap: wrap;
+      margin-bottom: 48px;
+      padding: 24px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--surface);
+      overflow-x: auto;
+    }
+    .pipeline-stage {
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+      padding: 12px 20px;
+      border: 1px solid rgba(124,92,255,0.25);
+      border-radius: 10px;
+      background: rgba(124,92,255,0.06);
+      min-width: 110px;
+    }
+    .pipeline-stage-name {
+      font-family: var(--mono); font-size: 11px;
+      font-weight: 500; color: var(--accent);
+      letter-spacing: 0.04em;
+    }
+    .pipeline-stage-desc {
+      font-size: 11px; color: rgba(255,255,255,0.5);
+      text-align: center;
+    }
+    .pipeline-arrow {
+      font-family: var(--mono); font-size: 18px;
+      color: rgba(255,255,255,0.2);
+      padding: 0 10px;
+      user-select: none;
+    }
+
+    /* ── Terminal demo ───────────────────────────────── */
+    .demo-wrap {
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      overflow: hidden;
+      background: #0c0c10;
+      margin-bottom: 24px;
+    }
+    .demo-panels {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 420px;
+    }
+    .demo-panel {
+      display: flex; flex-direction: column;
+    }
+    .demo-panel + .demo-panel {
+      border-left: 1px solid var(--border);
+    }
+    .demo-panel-head {
+      display: flex; align-items: center; gap: 8px;
+      padding: 12px 18px;
+      background: rgba(255,255,255,0.03);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .demo-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+    }
+    .demo-dot-r { background: #ff5f56; }
+    .demo-dot-y { background: #ffbd2e; }
+    .demo-dot-g { background: #27c93f; }
+    .demo-panel-label {
+      font-family: var(--mono); font-size: 11px;
+      color: rgba(255,255,255,0.55);
+      letter-spacing: 0.04em;
+      margin-left: 8px;
+    }
+    .demo-source {
+      flex: 1;
+      padding: 16px 18px;
+      overflow-y: auto;
+      max-height: 400px;
+    }
+    .demo-source textarea {
+      width: 100%; height: 100%; min-height: 340px;
+      background: transparent; border: none; outline: none;
+      font-family: var(--mono); font-size: 12.5px;
+      line-height: 1.7; color: rgba(255,255,255,0.85);
+      resize: none; tab-size: 2;
+    }
+    .demo-source textarea::placeholder { color: rgba(255,255,255,0.2); }
+    .demo-output {
+      flex: 1;
+      padding: 16px 18px;
+      overflow-y: auto;
+      font-family: var(--mono);
+      font-size: 12.5px;
+      line-height: 1.7;
+      color: rgba(255,255,255,0.7);
+      max-height: 400px;
+    }
+    .demo-output .line-ok { color: #22dd55; }
+    .demo-output .line-err { color: #ff5f56; }
+    .demo-output .line-info { color: rgba(255,255,255,0.45); }
+    .demo-output .line-ast { color: var(--accent); }
+    .demo-output .line-val { color: var(--accent2); }
+
+    /* ── Button bar ──────────────────────────────────── */
+    .demo-bar {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 18px;
+      border-top: 1px solid var(--border);
+      background: rgba(255,255,255,0.02);
+    }
+    .demo-bar-label {
+      font-family: var(--mono); font-size: 10px;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: rgba(255,255,255,0.35);
+      margin-right: auto;
+    }
+    .demo-run-btn {
+      font-family: var(--mono); font-size: 11px;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      padding: 8px 22px; border-radius: 8px;
+      border: 1px solid rgba(34,221,85,0.35);
+      background: rgba(34,221,85,0.1);
+      color: #22dd55;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s, color 0.2s;
+    }
+    .demo-run-btn:hover {
+      background: rgba(34,221,85,0.2);
+      border-color: rgba(34,221,85,0.55);
+      color: #fff;
+    }
+    .demo-data-input {
+      font-family: var(--mono); font-size: 12px;
+      background: transparent; border: 1px solid var(--border);
+      border-radius: 8px; padding: 8px 14px;
+      color: var(--fg); outline: none;
+      width: 200px;
+      transition: border-color 0.2s;
+    }
+    .demo-data-input:focus { border-color: rgba(0,212,255,0.4); }
+    .demo-data-input::placeholder { color: rgba(255,255,255,0.2); }
+
+    /* ── Quick examples ──────────────────────────────── */
+    .demo-quick {
+      display: flex; flex-wrap: wrap; gap: 8px;
+      margin-bottom: 32px;
+    }
+    .demo-qbtn {
+      font-family: var(--mono); font-size: 10.5px;
+      letter-spacing: 0.04em;
+      padding: 7px 14px; border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: rgba(255,255,255,0.7);
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s, background 0.2s;
+    }
+    .demo-qbtn:hover {
+      border-color: rgba(255,255,255,0.25);
+      color: var(--fg);
+      background: var(--surface-hi);
+    }
+
+    /* ── How it works note ───────────────────────────── */
+    .demo-note {
+      padding: 20px 24px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--surface);
+      margin-bottom: 48px;
+    }
+    .demo-note-title {
+      font-family: var(--mono); font-size: 10px;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--accent2);
+      margin-bottom: 10px;
+    }
+    .demo-note p {
+      font-size: 14px;
+      line-height: 1.7;
+      color: rgba(255,255,255,0.7);
+      margin: 0;
+    }
+
+    /* ── Grammar ref table ───────────────────────────── */
+    .cmd-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 48px;
+    }
+    .cmd-card {
+      padding: 16px 20px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--surface);
+    }
+    .cmd-name {
+      font-family: var(--mono); font-size: 13px;
+      font-weight: 500;
+      color: var(--accent2);
+      margin-bottom: 4px;
+    }
+    .cmd-desc {
+      font-size: 13px;
+      color: rgba(255,255,255,0.6);
+    }
+
+    @media (max-width: 760px) {
+      .demo-panels { grid-template-columns: 1fr; }
+      .demo-panel + .demo-panel { border-left: none; border-top: 1px solid var(--border); }
+      .cmd-grid { grid-template-columns: 1fr; }
+      .pipeline { flex-direction: column; gap: 8px; }
+      .pipeline-arrow { transform: rotate(90deg); padding: 4px 0; }
+      .demo-data-input { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="nav">
+    <a class="nav-logo" href="index.html" data-cursor="Home">SZ</a>
+    <div class="nav-links">
+      <a class="nav-link" href="work.html" data-cursor="Work">Work</a>
+      <a class="nav-link" href="experience.html" data-cursor="Experience">Experience</a>
+      <a class="nav-link" href="about.html" data-cursor="About">About</a>
+      <a class="nav-link" href="photos.html" data-cursor="Photos">Photos</a>
+      <a class="nav-link" href="contact.html" data-cursor="Contact">Contact</a>
+    </div>
+  </nav>
+
+  <main class="page-inner">
+
+    <!-- Hero -->
+    <section class="lamp-hero">
+      <div class="lamp-fx" aria-hidden="true">
+        <div class="lamp-cone lamp-cone-l"></div>
+        <div class="lamp-cone lamp-cone-r"></div>
+        <div class="lamp-glow"></div>
+        <div class="lamp-hotspot"></div>
+        <div class="lamp-bar"></div>
+      </div>
+      <h2 class="lamp-title">Core Language Interpreter</h2>
+      <span class="lamp-sub">Compiler &amp; Interpreter Fundamentals</span>
+    </section>
+
+    <!-- Project Overview -->
+    <section>
+      <div class="section-label">Overview</div>
+      <p class="proj-desc">
+        A <strong>full interpreter for the Core programming language</strong>, built in <strong>Java</strong> using a four-stage pipeline: tokenization, recursive-descent parsing, AST construction, and tree-walk execution. Supports <strong>integer arithmetic</strong>, <strong>conditionals</strong>, <strong>loops</strong>, and <strong>I/O</strong> — with pretty-printing and detailed error reporting at every stage.
+      </p>
+
+      <div class="proj-links">
+        <a class="proj-link" href="https://github.com/BigMuscleSmoe/core-language-interpreter" target="_blank" rel="noopener" data-cursor="GitHub">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          <span>View on GitHub</span>
+        </a>
+      </div>
+
+      <div class="proj-concepts">
+        <span class="proj-chip">Tokenizer</span>
+        <span class="proj-chip">Recursive-Descent Parser</span>
+        <span class="proj-chip">Abstract Syntax Tree</span>
+        <span class="proj-chip">Tree-Walk Execution</span>
+        <span class="proj-chip">Pretty-Printing</span>
+        <span class="proj-chip">Symbol Table</span>
+        <span class="proj-chip">Java</span>
+      </div>
+    </section>
+
+    <!-- Pipeline Diagram -->
+    <section>
+      <div class="section-label">Architecture</div>
+      <h3 class="section-title">Interpreter Pipeline</h3>
+      <div class="pipeline">
+        <div class="pipeline-stage">
+          <span class="pipeline-stage-name">Source</span>
+          <span class="pipeline-stage-desc">.core file</span>
+        </div>
+        <span class="pipeline-arrow">→</span>
+        <div class="pipeline-stage">
+          <span class="pipeline-stage-name">Tokenizer</span>
+          <span class="pipeline-stage-desc">Lexical analysis</span>
+        </div>
+        <span class="pipeline-arrow">→</span>
+        <div class="pipeline-stage">
+          <span class="pipeline-stage-name">Parser</span>
+          <span class="pipeline-stage-desc">Recursive descent</span>
+        </div>
+        <span class="pipeline-arrow">→</span>
+        <div class="pipeline-stage">
+          <span class="pipeline-stage-name">AST</span>
+          <span class="pipeline-stage-desc">Tree structure</span>
+        </div>
+        <span class="pipeline-arrow">→</span>
+        <div class="pipeline-stage">
+          <span class="pipeline-stage-name">Executor</span>
+          <span class="pipeline-stage-desc">Tree-walk eval</span>
+        </div>
+        <span class="pipeline-arrow">→</span>
+        <div class="pipeline-stage">
+          <span class="pipeline-stage-name">Output</span>
+          <span class="pipeline-stage-desc">Results</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Language Reference -->
+    <section>
+      <div class="section-label">Language Reference</div>
+      <div class="cmd-grid">
+        <div class="cmd-card">
+          <div class="cmd-name">int X, Y;</div>
+          <div class="cmd-desc">Declare integer variables (uppercase names)</div>
+        </div>
+        <div class="cmd-card">
+          <div class="cmd-name">X = 5 + Y * 2;</div>
+          <div class="cmd-desc">Assignment with arithmetic (+, -, *)</div>
+        </div>
+        <div class="cmd-card">
+          <div class="cmd-name">if ... then ... else ... end;</div>
+          <div class="cmd-desc">Conditional branching</div>
+        </div>
+        <div class="cmd-card">
+          <div class="cmd-name">while ... loop ... end;</div>
+          <div class="cmd-desc">Loop with condition</div>
+        </div>
+        <div class="cmd-card">
+          <div class="cmd-name">read X;</div>
+          <div class="cmd-desc">Read integer from data input</div>
+        </div>
+        <div class="cmd-card">
+          <div class="cmd-name">write X;</div>
+          <div class="cmd-desc">Write value to output</div>
+        </div>
+        <div class="cmd-card">
+          <div class="cmd-name">[X != 0]</div>
+          <div class="cmd-desc">Comparison (==, !=, &lt;, &gt;, &lt;=, &gt;=)</div>
+        </div>
+        <div class="cmd-card">
+          <div class="cmd-name">![cond] &amp;&amp; [cond] || [cond]</div>
+          <div class="cmd-desc">Logical NOT, AND, OR</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Interactive Demo -->
+    <section>
+      <div class="section-label">Interactive Demo</div>
+      <h3 class="section-title">Try it in the browser</h3>
+
+      <div class="demo-quick" id="quick-btns">
+        <button class="demo-qbtn" data-example="hello">Hello World</button>
+        <button class="demo-qbtn" data-example="sum">Sum 1 to N</button>
+        <button class="demo-qbtn" data-example="fibonacci">Fibonacci</button>
+        <button class="demo-qbtn" data-example="factorial">Factorial</button>
+        <button class="demo-qbtn" data-example="conditional">Conditionals</button>
+      </div>
+
+      <div class="demo-wrap">
+        <div class="demo-panels">
+          <div class="demo-panel">
+            <div class="demo-panel-head">
+              <span class="demo-dot demo-dot-r"></span>
+              <span class="demo-dot demo-dot-y"></span>
+              <span class="demo-dot demo-dot-g"></span>
+              <span class="demo-panel-label">Source — program.core</span>
+            </div>
+            <div class="demo-source">
+              <textarea id="source-input" spellcheck="false" placeholder="Write Core code here...">program
+  int X;
+  X = 42;
+  write X;
+end</textarea>
+            </div>
+          </div>
+          <div class="demo-panel">
+            <div class="demo-panel-head">
+              <span class="demo-dot demo-dot-r"></span>
+              <span class="demo-dot demo-dot-y"></span>
+              <span class="demo-dot demo-dot-g"></span>
+              <span class="demo-panel-label">Output</span>
+            </div>
+            <div class="demo-output" id="demo-output">
+              <div class="line-info">Press Run or Ctrl+Enter to execute</div>
+            </div>
+          </div>
+        </div>
+        <div class="demo-bar">
+          <span class="demo-bar-label">Data input (for read statements):</span>
+          <input class="demo-data-input" id="data-input" type="text" placeholder="e.g. 10 5 3" autocomplete="off" spellcheck="false" />
+          <button class="demo-run-btn" id="run-btn">▶ Run</button>
+        </div>
+      </div>
+
+      <div class="demo-note">
+        <div class="demo-note-title">How it works</div>
+        <p>The real interpreter is written in <strong style="color:var(--fg)">Java</strong> with separate classes for each AST node — tokenizer, parser, and executor. This browser demo reimplements the same four-stage pipeline entirely in JavaScript: tokenization, recursive-descent parsing, AST pretty-printing, and tree-walk execution — same grammar rules, same error messages.</p>
+      </div>
+    </section>
+
+    <footer class="page-footer">
+      <span class="footer-copy">© <span id="year"></span> Steven Zhang</span>
+      <a class="footer-copy" href="work.html" data-cursor="Work" style="text-decoration: none;">← Work</a>
+    </footer>
+  </main>
+
+  <script src="script.js"></script>
+  <script>
+  (function() {
+    var sourceEl = document.getElementById('source-input');
+    var dataEl = document.getElementById('data-input');
+    var outputEl = document.getElementById('demo-output');
+    var runBtn = document.getElementById('run-btn');
+
+    // ── Example programs ──────────────────────────────
+    var EXAMPLES = {
+      hello: {
+        source: 'program\n  int X;\n  X = 42;\n  write X;\nend',
+        data: ''
+      },
+      sum: {
+        source: 'program\n  int N, SUM, I;\n  read N;\n  SUM = 0;\n  I = 1;\n  while [I <= N] loop\n    SUM = SUM + I;\n    I = I + 1;\n  end;\n  write SUM;\nend',
+        data: '10'
+      },
+      fibonacci: {
+        source: 'program\n  int N, A, B, TEMP, I;\n  read N;\n  A = 0;\n  B = 1;\n  I = 1;\n  while [I <= N] loop\n    write A;\n    TEMP = A + B;\n    A = B;\n    B = TEMP;\n    I = I + 1;\n  end;\nend',
+        data: '10'
+      },
+      factorial: {
+        source: 'program\n  int N, RESULT;\n  read N;\n  RESULT = 1;\n  while [N > 0] loop\n    RESULT = RESULT * N;\n    N = N - 1;\n  end;\n  write RESULT;\nend',
+        data: '6'
+      },
+      conditional: {
+        source: 'program\n  int X, Y;\n  read X;\n  read Y;\n  if [X > Y] then\n    write X;\n  else\n    write Y;\n  end;\nend',
+        data: '15 7'
+      }
+    };
+
+    // ── Output helpers ────────────────────────────────
+    function clearOutput() { outputEl.innerHTML = ''; }
+    function addLine(text, cls) {
+      var d = document.createElement('div');
+      if (cls) d.className = cls;
+      d.textContent = text;
+      outputEl.appendChild(d);
+      outputEl.scrollTop = outputEl.scrollHeight;
+    }
+
+    // ── Token types ───────────────────────────────────
+    var TT = {
+      PROGRAM:1, BEGIN:2, END:3, INT:4, IF:5, THEN:6, ELSE:7,
+      WHILE:8, LOOP:9, READ:10, WRITE:11,
+      SEMI:12, COMMA:13, ASSIGN:14, BANG:15, LBRACKET:16, RBRACKET:17,
+      AND:18, OR:19,
+      PLUS:20, MINUS:21, STAR:22,
+      NEQ:23, EQ:24, LT:25, GT:26, LTE:27, GTE:28,
+      LPAREN:29, RPAREN:30,
+      CONST:31, ID:32, EOF:33
+    };
+
+    var KEYWORDS = {
+      'program':TT.PROGRAM, 'begin':TT.BEGIN, 'end':TT.END, 'int':TT.INT,
+      'if':TT.IF, 'then':TT.THEN, 'else':TT.ELSE,
+      'while':TT.WHILE, 'loop':TT.LOOP,
+      'read':TT.READ, 'write':TT.WRITE
+    };
+
+    // ── Tokenizer ─────────────────────────────────────
+    function tokenize(src) {
+      var tokens = [];
+      var i = 0;
+      while (i < src.length) {
+        if (/\s/.test(src[i])) { i++; continue; }
+
+        if (src[i] === '/' && src[i+1] === '/') {
+          while (i < src.length && src[i] !== '\n') i++;
+          continue;
+        }
+
+        if (/[0-9]/.test(src[i])) {
+          var num = '';
+          while (i < src.length && /[0-9]/.test(src[i])) { num += src[i]; i++; }
+          tokens.push({ type: TT.CONST, val: parseInt(num,10) });
+          continue;
+        }
+
+        if (/[A-Za-z]/.test(src[i])) {
+          var word = '';
+          while (i < src.length && /[A-Za-z0-9]/.test(src[i])) { word += src[i]; i++; }
+          var lower = word.toLowerCase();
+          if (KEYWORDS[lower] !== undefined) {
+            tokens.push({ type: KEYWORDS[lower], val: lower });
+          } else {
+            tokens.push({ type: TT.ID, val: word });
+          }
+          continue;
+        }
+
+        var ch = src[i];
+        if (ch === ';') { tokens.push({ type: TT.SEMI }); i++; }
+        else if (ch === ',') { tokens.push({ type: TT.COMMA }); i++; }
+        else if (ch === '+') { tokens.push({ type: TT.PLUS }); i++; }
+        else if (ch === '-') { tokens.push({ type: TT.MINUS }); i++; }
+        else if (ch === '*') { tokens.push({ type: TT.STAR }); i++; }
+        else if (ch === '(') { tokens.push({ type: TT.LPAREN }); i++; }
+        else if (ch === ')') { tokens.push({ type: TT.RPAREN }); i++; }
+        else if (ch === '[') { tokens.push({ type: TT.LBRACKET }); i++; }
+        else if (ch === ']') { tokens.push({ type: TT.RBRACKET }); i++; }
+        else if (ch === '!' && src[i+1] === '=') { tokens.push({ type: TT.NEQ }); i+=2; }
+        else if (ch === '!') { tokens.push({ type: TT.BANG }); i++; }
+        else if (ch === '&' && src[i+1] === '&') { tokens.push({ type: TT.AND }); i+=2; }
+        else if (ch === '|' && src[i+1] === '|') { tokens.push({ type: TT.OR }); i+=2; }
+        else if (ch === '=' && src[i+1] === '=') { tokens.push({ type: TT.EQ }); i+=2; }
+        else if (ch === '=') { tokens.push({ type: TT.ASSIGN }); i++; }
+        else if (ch === '<' && src[i+1] === '=') { tokens.push({ type: TT.LTE }); i+=2; }
+        else if (ch === '<') { tokens.push({ type: TT.LT }); i++; }
+        else if (ch === '>' && src[i+1] === '=') { tokens.push({ type: TT.GTE }); i+=2; }
+        else if (ch === '>') { tokens.push({ type: TT.GT }); i++; }
+        else {
+          throw new Error("Tokenizer: unexpected character '" + ch + "'");
+        }
+      }
+      tokens.push({ type: TT.EOF });
+      return tokens;
+    }
+
+    // ── Parser ────────────────────────────────────────
+    function Parser(tokens) {
+      this.tokens = tokens;
+      this.pos = 0;
+    }
+    Parser.prototype.peek = function() { return this.tokens[this.pos]; };
+    Parser.prototype.eat = function(type) {
+      var t = this.tokens[this.pos];
+      if (t.type !== type) throw new Error("Parser: expected token type " + type + " but got " + t.type + (t.val !== undefined ? " ('" + t.val + "')" : ""));
+      this.pos++;
+      return t;
+    };
+    Parser.prototype.parseProg = function() {
+      this.eat(TT.PROGRAM);
+      var decls = this.parseDeclSeq();
+      var body = this.parseStmtSeq();
+      this.eat(TT.END);
+      return { type:'prog', decls:decls, body:body };
+    };
+    Parser.prototype.parseDeclSeq = function() {
+      var decls = [];
+      while (this.peek().type === TT.INT) {
+        decls.push(this.parseDecl());
+      }
+      return decls;
+    };
+    Parser.prototype.parseDecl = function() {
+      this.eat(TT.INT);
+      var ids = [this.eat(TT.ID).val];
+      while (this.peek().type === TT.COMMA) {
+        this.eat(TT.COMMA);
+        ids.push(this.eat(TT.ID).val);
+      }
+      this.eat(TT.SEMI);
+      return { type:'decl', ids:ids };
+    };
+    Parser.prototype.parseStmtSeq = function() {
+      var stmts = [this.parseStmt()];
+      while (this.peek().type !== TT.END && this.peek().type !== TT.ELSE && this.peek().type !== TT.EOF) {
+        stmts.push(this.parseStmt());
+      }
+      return stmts;
+    };
+    Parser.prototype.parseStmt = function() {
+      var t = this.peek();
+      if (t.type === TT.ID) return this.parseAssign();
+      if (t.type === TT.IF) return this.parseIf();
+      if (t.type === TT.WHILE) return this.parseWhile();
+      if (t.type === TT.READ) return this.parseRead();
+      if (t.type === TT.WRITE) return this.parseWrite();
+      throw new Error("Parser: unexpected token '" + (t.val||'') + "'");
+    };
+    Parser.prototype.parseAssign = function() {
+      var id = this.eat(TT.ID).val;
+      this.eat(TT.ASSIGN);
+      var expr = this.parseExp();
+      this.eat(TT.SEMI);
+      return { type:'assign', id:id, expr:expr };
+    };
+    Parser.prototype.parseIf = function() {
+      this.eat(TT.IF);
+      var cond = this.parseCond();
+      this.eat(TT.THEN);
+      var thenB = this.parseStmtSeq();
+      var elseB = null;
+      if (this.peek().type === TT.ELSE) {
+        this.eat(TT.ELSE);
+        elseB = this.parseStmtSeq();
+      }
+      this.eat(TT.END);
+      this.eat(TT.SEMI);
+      return { type:'if', cond:cond, then:thenB, else:elseB };
+    };
+    Parser.prototype.parseWhile = function() {
+      this.eat(TT.WHILE);
+      var cond = this.parseCond();
+      this.eat(TT.LOOP);
+      var body = this.parseStmtSeq();
+      this.eat(TT.END);
+      this.eat(TT.SEMI);
+      return { type:'while', cond:cond, body:body };
+    };
+    Parser.prototype.parseRead = function() {
+      this.eat(TT.READ);
+      var id = this.eat(TT.ID).val;
+      this.eat(TT.SEMI);
+      return { type:'read', id:id };
+    };
+    Parser.prototype.parseWrite = function() {
+      this.eat(TT.WRITE);
+      var expr = this.parseExp();
+      this.eat(TT.SEMI);
+      return { type:'write', expr:expr };
+    };
+    Parser.prototype.parseCond = function() {
+      var node = this.parseCmpr();
+      while (this.peek().type === TT.AND || this.peek().type === TT.OR) {
+        var op = this.peek().type === TT.AND ? '&&' : '||';
+        this.pos++;
+        node = { type:'logic', op:op, left:node, right:this.parseCmpr() };
+      }
+      return node;
+    };
+    Parser.prototype.parseCmpr = function() {
+      if (this.peek().type === TT.BANG) {
+        this.eat(TT.BANG);
+        return { type:'not', cond:this.parseCmpr() };
+      }
+      this.eat(TT.LBRACKET);
+      var left = this.parseExp();
+      var opMap = {}; opMap[TT.NEQ]='!='; opMap[TT.EQ]='=='; opMap[TT.LT]='<'; opMap[TT.GT]='>'; opMap[TT.LTE]='<='; opMap[TT.GTE]='>=';
+      var opTok = this.peek();
+      if (!opMap[opTok.type]) throw new Error("Parser: expected comparison operator");
+      var op = opMap[opTok.type];
+      this.pos++;
+      var right = this.parseExp();
+      this.eat(TT.RBRACKET);
+      return { type:'cmp', op:op, left:left, right:right };
+    };
+    Parser.prototype.parseExp = function() {
+      var node = this.parseTerm();
+      while (this.peek().type === TT.PLUS || this.peek().type === TT.MINUS) {
+        var op = this.peek().type === TT.PLUS ? '+' : '-';
+        this.pos++;
+        node = { type:'binop', op:op, left:node, right:this.parseTerm() };
+      }
+      return node;
+    };
+    Parser.prototype.parseTerm = function() {
+      var node = this.parseFactor();
+      while (this.peek().type === TT.STAR) {
+        this.pos++;
+        node = { type:'binop', op:'*', left:node, right:this.parseFactor() };
+      }
+      return node;
+    };
+    Parser.prototype.parseFactor = function() {
+      var t = this.peek();
+      if (t.type === TT.CONST) { this.pos++; return { type:'const', val:t.val }; }
+      if (t.type === TT.ID) { this.pos++; return { type:'id', val:t.val }; }
+      if (t.type === TT.LPAREN) {
+        this.eat(TT.LPAREN);
+        var expr = this.parseExp();
+        this.eat(TT.RPAREN);
+        return expr;
+      }
+      throw new Error("Parser: unexpected token in expression");
+    };
+
+    // ── Pretty-printer ────────────────────────────────
+    function prettyPrint(node, indent) {
+      indent = indent || 0;
+      var pad = new Array(indent + 1).join('  ');
+      var lines = [];
+      if (node.type === 'prog') {
+        lines.push('program');
+        node.decls.forEach(function(d) { lines = lines.concat(prettyPrint(d, 1)); });
+        node.body.forEach(function(s) { lines = lines.concat(prettyPrint(s, 1)); });
+        lines.push('end');
+      } else if (node.type === 'decl') {
+        lines.push(pad + 'int ' + node.ids.join(', ') + ';');
+      } else if (node.type === 'assign') {
+        lines.push(pad + node.id + ' = ' + printExp(node.expr) + ';');
+      } else if (node.type === 'if') {
+        lines.push(pad + 'if ' + printCond(node.cond) + ' then');
+        node.then.forEach(function(s) { lines = lines.concat(prettyPrint(s, indent+1)); });
+        if (node.else) {
+          lines.push(pad + 'else');
+          node.else.forEach(function(s) { lines = lines.concat(prettyPrint(s, indent+1)); });
+        }
+        lines.push(pad + 'end;');
+      } else if (node.type === 'while') {
+        lines.push(pad + 'while ' + printCond(node.cond) + ' loop');
+        node.body.forEach(function(s) { lines = lines.concat(prettyPrint(s, indent+1)); });
+        lines.push(pad + 'end;');
+      } else if (node.type === 'read') {
+        lines.push(pad + 'read ' + node.id + ';');
+      } else if (node.type === 'write') {
+        lines.push(pad + 'write ' + printExp(node.expr) + ';');
+      }
+      return lines;
+    }
+    function printExp(n) {
+      if (n.type === 'const') return '' + n.val;
+      if (n.type === 'id') return n.val;
+      if (n.type === 'binop') return printExp(n.left) + ' ' + n.op + ' ' + printExp(n.right);
+      return '?';
+    }
+    function printCond(n) {
+      if (n.type === 'cmp') return '[' + printExp(n.left) + ' ' + n.op + ' ' + printExp(n.right) + ']';
+      if (n.type === 'not') return '!' + printCond(n.cond);
+      if (n.type === 'logic') return printCond(n.left) + ' ' + n.op + ' ' + printCond(n.right);
+      return '?';
+    }
+
+    // ── Executor ──────────────────────────────────────
+    function execute(ast, dataValues) {
+      var env = {};
+      var declared = {};
+      var dataPos = 0;
+      var output = [];
+      var steps = 0;
+      var MAX_STEPS = 100000;
+
+      function checkSteps() {
+        if (++steps > MAX_STEPS) throw new Error("Runtime: exceeded " + MAX_STEPS + " steps (infinite loop?)");
+      }
+
+      ast.decls.forEach(function(d) {
+        d.ids.forEach(function(id) {
+          if (declared[id]) throw new Error("Runtime: variable '" + id + "' already declared");
+          declared[id] = true;
+        });
+      });
+
+      function evalExp(n) {
+        checkSteps();
+        if (n.type === 'const') return n.val;
+        if (n.type === 'id') {
+          if (!declared[n.val]) throw new Error("Runtime: variable '" + n.val + "' not declared");
+          if (env[n.val] === undefined) throw new Error("Runtime: variable '" + n.val + "' not initialized");
+          return env[n.val];
+        }
+        if (n.type === 'binop') {
+          var l = evalExp(n.left), r = evalExp(n.right);
+          if (n.op === '+') return l + r;
+          if (n.op === '-') return l - r;
+          if (n.op === '*') return l * r;
+        }
+        throw new Error("Runtime: unknown expression type");
+      }
+
+      function evalCond(n) {
+        checkSteps();
+        if (n.type === 'cmp') {
+          var l = evalExp(n.left), r = evalExp(n.right);
+          if (n.op === '==') return l === r;
+          if (n.op === '!=') return l !== r;
+          if (n.op === '<') return l < r;
+          if (n.op === '>') return l > r;
+          if (n.op === '<=') return l <= r;
+          if (n.op === '>=') return l >= r;
+        }
+        if (n.type === 'not') return !evalCond(n.cond);
+        if (n.type === 'logic') {
+          if (n.op === '&&') return evalCond(n.left) && evalCond(n.right);
+          if (n.op === '||') return evalCond(n.left) || evalCond(n.right);
+        }
+        throw new Error("Runtime: unknown condition type");
+      }
+
+      function execStmt(s) {
+        checkSteps();
+        if (s.type === 'assign') {
+          if (!declared[s.id]) throw new Error("Runtime: variable '" + s.id + "' not declared");
+          env[s.id] = evalExp(s.expr);
+        } else if (s.type === 'if') {
+          if (evalCond(s.cond)) {
+            s.then.forEach(execStmt);
+          } else if (s.else) {
+            s.else.forEach(execStmt);
+          }
+        } else if (s.type === 'while') {
+          while (evalCond(s.cond)) {
+            s.body.forEach(execStmt);
+          }
+        } else if (s.type === 'read') {
+          if (!declared[s.id]) throw new Error("Runtime: variable '" + s.id + "' not declared");
+          if (dataPos >= dataValues.length) throw new Error("Runtime: no more data to read for '" + s.id + "'");
+          var v = parseInt(dataValues[dataPos++], 10);
+          if (isNaN(v)) throw new Error("Runtime: invalid integer in data input");
+          env[s.id] = v;
+        } else if (s.type === 'write') {
+          output.push(evalExp(s.expr));
+        }
+      }
+
+      ast.body.forEach(execStmt);
+      return output;
+    }
+
+    // ── Run handler ───────────────────────────────────
+    function run() {
+      clearOutput();
+      var src = sourceEl.value;
+      var dataStr = dataEl.value.trim();
+      var dataValues = dataStr ? dataStr.split(/\s+/) : [];
+
+      addLine('Tokenizing...', 'line-info');
+      var tokens;
+      try { tokens = tokenize(src); }
+      catch(e) { addLine('ERROR: ' + e.message, 'line-err'); return; }
+      addLine('✓ ' + (tokens.length - 1) + ' tokens', 'line-ok');
+
+      addLine('Parsing...', 'line-info');
+      var ast;
+      try { ast = new Parser(tokens).parseProg(); }
+      catch(e) { addLine('ERROR: ' + e.message, 'line-err'); return; }
+      addLine('✓ AST built', 'line-ok');
+
+      addLine('Pretty-print:', 'line-info');
+      prettyPrint(ast).forEach(function(l) { addLine('  ' + l, 'line-ast'); });
+
+      addLine('Executing...', 'line-info');
+      var result;
+      try { result = execute(ast, dataValues); }
+      catch(e) { addLine('ERROR: ' + e.message, 'line-err'); return; }
+
+      addLine('─── Output ───', 'line-info');
+      if (result.length === 0) {
+        addLine('(no output)', 'line-info');
+      } else {
+        result.forEach(function(v) { addLine('' + v, 'line-val'); });
+      }
+      addLine('✓ Done (' + result.length + ' value' + (result.length !== 1 ? 's' : '') + ' written)', 'line-ok');
+    }
+
+    // ── Event listeners ───────────────────────────────
+    runBtn.addEventListener('click', run);
+    sourceEl.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); run(); }
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        var start = this.selectionStart;
+        this.value = this.value.substring(0, start) + '  ' + this.value.substring(this.selectionEnd);
+        this.selectionStart = this.selectionEnd = start + 2;
+      }
+    });
+
+    document.getElementById('quick-btns').addEventListener('click', function(e) {
+      var btn = e.target.closest('[data-example]');
+      if (!btn) return;
+      var ex = EXAMPLES[btn.getAttribute('data-example')];
+      if (!ex) return;
+      sourceEl.value = ex.source;
+      dataEl.value = ex.data;
+      run();
+    });
+  })();
+  </script>
+</body>
+</html>
