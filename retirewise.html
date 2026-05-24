@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>RetireWise — Steven Zhang</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* ── Project overview ────────────────────────────── */
+    .proj-desc {
+      font-size: clamp(18px, 2.4vw, 22px);
+      line-height: 1.75;
+      color: #e0e0e0 !important;
+      max-width: 62ch;
+      margin-bottom: 36px;
+      position: relative;
+      z-index: 10;
+    }
+    .proj-desc strong { color: #fff !important; font-weight: 600; }
+
+    .proj-links {
+      display: flex; gap: 12px; flex-wrap: wrap;
+      margin-bottom: 48px;
+    }
+    .proj-link {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: var(--mono); font-size: 11px;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      padding: 10px 20px; border-radius: 999px;
+      border: 1px solid rgba(0,212,255,0.25);
+      background: rgba(0,212,255,0.07);
+      color: var(--accent2);
+      transition: background 0.2s, border-color 0.2s, color 0.2s;
+      text-decoration: none;
+    }
+    .proj-link:hover {
+      background: rgba(0,212,255,0.15);
+      border-color: rgba(0,212,255,0.45);
+      color: #fff;
+    }
+
+    .proj-concepts {
+      display: flex; flex-wrap: wrap; gap: 10px;
+      margin-bottom: 56px;
+    }
+    .proj-chip {
+      font-family: var(--mono); font-size: 10.5px;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      padding: 6px 16px; border-radius: 8px;
+      border: 1px solid rgba(124,92,255,0.3);
+      background: rgba(124,92,255,0.1);
+      color: rgba(160,140,255,0.95);
+    }
+
+    /* ── Section headers ─────────────────────────────── */
+    .section-label {
+      font-family: var(--mono); font-size: 10px;
+      letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--accent2);
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 700; letter-spacing: -0.03em;
+      margin-bottom: 24px;
+    }
+
+    /* ── Architecture diagram ────────────────────────── */
+    .arch {
+      display: flex; align-items: center; gap: 0;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 48px;
+      padding: 24px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--surface);
+      overflow-x: auto;
+    }
+    .arch-stage {
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+      padding: 14px 22px;
+      border: 1px solid rgba(124,92,255,0.25);
+      border-radius: 10px;
+      background: rgba(124,92,255,0.06);
+      min-width: 160px;
+      flex: 1;
+    }
+    .arch-stage-name {
+      font-family: var(--mono); font-size: 11px;
+      font-weight: 500; color: var(--accent);
+      letter-spacing: 0.04em;
+    }
+    .arch-stage-desc {
+      font-size: 11px; color: rgba(255,255,255,0.5);
+      text-align: center;
+    }
+    .arch-arrow {
+      font-family: var(--mono); font-size: 18px;
+      color: rgba(255,255,255,0.2);
+      padding: 0 20px;
+      user-select: none;
+    }
+
+    /* ── Feature cards ───────────────────────────────── */
+    .feat-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 48px;
+    }
+    .feat-card {
+      padding: 20px 24px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--surface);
+    }
+    .feat-name {
+      font-family: var(--mono); font-size: 13px;
+      font-weight: 500;
+      color: var(--accent2);
+      margin-bottom: 6px;
+    }
+    .feat-desc {
+      font-size: 13px;
+      line-height: 1.6;
+      color: rgba(255,255,255,0.6);
+    }
+
+    /* ── Contributions list ──────────────────────────── */
+    .contrib-list {
+      list-style: none;
+      margin-bottom: 48px;
+    }
+    .contrib-list li {
+      position: relative;
+      padding: 14px 0 14px 24px;
+      font-size: 15px;
+      line-height: 1.7;
+      color: rgba(255,255,255,0.75);
+      border-bottom: 1px solid var(--border);
+    }
+    .contrib-list li::before {
+      content: '\2192';
+      position: absolute;
+      left: 0;
+      color: var(--accent2);
+      font-family: var(--mono);
+    }
+    .contrib-list li strong {
+      color: #fff;
+      font-weight: 600;
+    }
+
+    @media (max-width: 760px) {
+      .feat-grid { grid-template-columns: 1fr; }
+      .arch { flex-direction: column; gap: 8px; }
+      .arch-arrow { transform: rotate(90deg); padding: 4px 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="nav">
+    <a class="nav-logo" href="index.html" data-cursor="Home">SZ</a>
+    <div class="nav-links">
+      <a class="nav-link" href="work.html" data-cursor="Work">Work</a>
+      <a class="nav-link" href="experience.html" data-cursor="Experience">Experience</a>
+      <a class="nav-link" href="about.html" data-cursor="About">About</a>
+      <a class="nav-link" href="photos.html" data-cursor="Photos">Photos</a>
+      <a class="nav-link" href="contact.html" data-cursor="Contact">Contact</a>
+    </div>
+  </nav>
+
+  <main class="page-inner">
+
+    <!-- Hero -->
+    <section class="lamp-hero">
+      <div class="lamp-fx" aria-hidden="true">
+        <div class="lamp-cone lamp-cone-l"></div>
+        <div class="lamp-cone lamp-cone-r"></div>
+        <div class="lamp-glow"></div>
+        <div class="lamp-hotspot"></div>
+        <div class="lamp-bar"></div>
+      </div>
+      <h2 class="lamp-title">RetireWise</h2>
+      <span class="lamp-sub">Retirement Account Dashboard · Full-Stack</span>
+    </section>
+
+    <!-- Overview -->
+    <section>
+      <div class="section-label">Overview</div>
+      <p class="proj-desc">
+        A <strong>full-stack retirement account dashboard</strong> for tracking 401(k) balances, monitoring contribution history, and generating retirement income projections. Built with <strong>Angular 19</strong> on the frontend and <strong>Spring Boot 3</strong> on the backend, with <strong>JWT authentication</strong>, role-based access control, and interactive Chart.js visualizations.
+      </p>
+
+      <div class="proj-links">
+        <a class="proj-link" href="https://github.com/BigMuscleSmoe/retirement-dashboard" target="_blank" rel="noopener" data-cursor="GitHub">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          <span>View on GitHub</span>
+        </a>
+      </div>
+
+      <div class="proj-concepts">
+        <span class="proj-chip">Angular 19</span>
+        <span class="proj-chip">TypeScript</span>
+        <span class="proj-chip">Chart.js</span>
+        <span class="proj-chip">Java 17</span>
+        <span class="proj-chip">Spring Boot 3</span>
+        <span class="proj-chip">Spring Security</span>
+        <span class="proj-chip">PostgreSQL 16</span>
+        <span class="proj-chip">JWT Auth</span>
+        <span class="proj-chip">Docker</span>
+        <span class="proj-chip">Flyway</span>
+      </div>
+    </section>
+
+    <!-- Architecture -->
+    <section>
+      <div class="section-label">Architecture</div>
+      <h3 class="section-title">System Design</h3>
+      <div class="arch">
+        <div class="arch-stage">
+          <span class="arch-stage-name">Angular</span>
+          <span class="arch-stage-desc">JWT Interceptor, Auth Guard, Chart.js</span>
+        </div>
+        <span class="arch-arrow">HTTP/REST &rarr;</span>
+        <div class="arch-stage">
+          <span class="arch-stage-name">Spring Boot</span>
+          <span class="arch-stage-desc">JWT Auth Filter, Spring Security, Flyway</span>
+        </div>
+        <span class="arch-arrow">JPA/JDBC &rarr;</span>
+        <div class="arch-stage">
+          <span class="arch-stage-name">PostgreSQL</span>
+          <span class="arch-stage-desc">Persistent storage</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features -->
+    <section>
+      <div class="section-label">Features</div>
+      <div class="feat-grid">
+        <div class="feat-card reveal">
+          <div class="feat-name">Dashboard Overview</div>
+          <div class="feat-desc">Total account balance, YTD contribution progress against IRS limits, balance trend line chart, and asset allocation doughnut chart.</div>
+        </div>
+        <div class="feat-card reveal d1">
+          <div class="feat-name">Contribution Management</div>
+          <div class="feat-desc">Paginated contribution history with employee/employer breakdown, modal for adding new contributions, and pay period tracking.</div>
+        </div>
+        <div class="feat-card reveal d2">
+          <div class="feat-name">Retirement Projections</div>
+          <div class="feat-desc">Compound growth calculator with customizable parameters — projected future balance and estimated monthly retirement income using the 4% withdrawal rule.</div>
+        </div>
+        <div class="feat-card reveal d3">
+          <div class="feat-name">Authentication &amp; Security</div>
+          <div class="feat-desc">Stateless JWT sessions with refresh tokens, BCrypt password hashing, role-based access control, XSS/clickjacking protection headers, and CORS configuration.</div>
+        </div>
+        <div class="feat-card reveal d4">
+          <div class="feat-name">Data Visualization</div>
+          <div class="feat-desc">Interactive Chart.js charts for balance trends, asset allocation breakdowns, and growth projections with customizable parameters.</div>
+        </div>
+        <div class="feat-card reveal d5">
+          <div class="feat-name">Database Migrations</div>
+          <div class="feat-desc">Flyway-managed schema migrations with PostgreSQL 16, JPA/JDBC persistence layer, and Docker Compose for local development.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- What I Built -->
+    <section>
+      <div class="section-label">Highlights</div>
+      <h3 class="section-title">What I Built</h3>
+      <ul class="contrib-list">
+        <li>Designed and built the <strong>Angular 19 SPA frontend</strong> with TypeScript — dashboard views, contribution management, and retirement projection calculators</li>
+        <li>Implemented <strong>interactive Chart.js visualizations</strong> for balance trends, asset allocation doughnut charts, and compound growth projections</li>
+        <li>Built the <strong>Spring Boot 3 REST API</strong> with Java 17 — account endpoints, contribution CRUD, and projection calculations</li>
+        <li>Engineered <strong>JWT authentication</strong> with access + refresh tokens, BCrypt hashing, and role-based access control via Spring Security</li>
+        <li>Set up <strong>PostgreSQL 16 with Flyway migrations</strong>, Docker Compose for local dev, and GitHub Actions CI/CD pipeline</li>
+        <li>Applied <strong>security hardening</strong> — XSS/clickjacking headers, input validation via Jakarta Bean Validation, and CORS configuration</li>
+      </ul>
+    </section>
+
+    <footer class="page-footer">
+      <span class="footer-copy">&copy; <span id="year"></span> Steven Zhang</span>
+      <a class="footer-copy" href="work.html" data-cursor="Work" style="text-decoration: none;">&larr; Work</a>
+    </footer>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
