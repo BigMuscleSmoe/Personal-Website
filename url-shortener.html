@@ -1,0 +1,745 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>URL Shortener — Steven Zhang</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* ── Project overview ────────────────────────────── */
+    .proj-desc {
+      font-size: clamp(18px, 2.4vw, 22px);
+      line-height: 1.75;
+      color: #e0e0e0 !important;
+      max-width: 62ch;
+      margin-bottom: 36px;
+      position: relative;
+      z-index: 10;
+    }
+    .proj-desc strong { color: #fff !important; font-weight: 600; }
+
+    .proj-links {
+      display: flex; gap: 12px; flex-wrap: wrap;
+      margin-bottom: 48px;
+    }
+    .proj-link {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: var(--mono); font-size: 11px;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      padding: 10px 20px; border-radius: 999px;
+      border: 1px solid rgba(0,212,255,0.25);
+      background: rgba(0,212,255,0.07);
+      color: var(--accent2);
+      transition: background 0.2s, border-color 0.2s, color 0.2s;
+      text-decoration: none;
+    }
+    .proj-link:hover {
+      background: rgba(0,212,255,0.15);
+      border-color: rgba(0,212,255,0.45);
+      color: #fff;
+    }
+
+    .proj-concepts {
+      display: flex; flex-wrap: wrap; gap: 10px;
+      margin-bottom: 56px;
+    }
+    .proj-chip {
+      font-family: var(--mono); font-size: 10.5px;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      padding: 6px 16px; border-radius: 8px;
+      border: 1px solid rgba(124,92,255,0.3);
+      background: rgba(124,92,255,0.1);
+      color: rgba(160,140,255,0.95);
+    }
+
+    /* ── Section headers ─────────────────────────────── */
+    .section-label {
+      font-family: var(--mono); font-size: 10px;
+      letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--accent2);
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 700; letter-spacing: -0.03em;
+      margin-bottom: 24px;
+    }
+
+    /* ── Architecture diagram (layered) ──────────────── */
+    .arch {
+      display: flex; flex-direction: column; align-items: center;
+      margin-bottom: 48px;
+      padding: 32px 24px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--surface);
+    }
+    .arch-tier {
+      display: flex; gap: 14px;
+      justify-content: center; align-items: stretch;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+    .arch-stage {
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; gap: 6px;
+      padding: 16px 24px;
+      border: 1px solid rgba(124,92,255,0.25);
+      border-radius: 10px;
+      background: rgba(124,92,255,0.06);
+      min-width: 220px;
+      text-align: center;
+    }
+    .arch-stage-name {
+      font-family: var(--mono); font-size: 12px;
+      font-weight: 500; color: var(--accent);
+      letter-spacing: 0.04em;
+    }
+    .arch-stage-desc {
+      font-size: 11px; color: rgba(255,255,255,0.5);
+      line-height: 1.5;
+    }
+    /* Data tier (Redis + PostgreSQL) in cyan to read as "backing stores" */
+    .arch-stores .arch-stage {
+      border-color: rgba(0,212,255,0.25);
+      background: rgba(0,212,255,0.06);
+    }
+    .arch-stores .arch-stage-name { color: var(--accent2); }
+    .arch-flow {
+      font-family: var(--mono); font-size: 10px;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: rgba(255,255,255,0.35);
+      padding: 12px 0;
+      user-select: none;
+      text-align: center;
+    }
+
+    /* ── Command / endpoint ref ──────────────────────── */
+    .cmd-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 48px;
+    }
+    .cmd-card {
+      padding: 16px 20px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--surface);
+    }
+    .cmd-name {
+      font-family: var(--mono); font-size: 13px;
+      font-weight: 500;
+      color: var(--accent2);
+      margin-bottom: 4px;
+      word-break: break-word;
+    }
+    .cmd-desc {
+      font-size: 13px;
+      color: rgba(255,255,255,0.6);
+    }
+
+    /* ── Terminal demo ───────────────────────────────── */
+    .demo-wrap {
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      overflow: hidden;
+      background: #0c0c10;
+      margin-bottom: 24px;
+    }
+    .demo-panels {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 420px;
+    }
+    .demo-panel {
+      display: flex; flex-direction: column;
+    }
+    .demo-panel + .demo-panel {
+      border-left: 1px solid var(--border);
+    }
+    .demo-panel-head {
+      display: flex; align-items: center; gap: 8px;
+      padding: 12px 18px;
+      background: rgba(255,255,255,0.03);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .demo-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+    }
+    .demo-dot-r { background: #ff5f56; }
+    .demo-dot-y { background: #ffbd2e; }
+    .demo-dot-g { background: #27c93f; }
+    .demo-panel-label {
+      font-family: var(--mono); font-size: 11px;
+      color: rgba(255,255,255,0.55);
+      letter-spacing: 0.04em;
+      margin-left: 8px;
+    }
+    .demo-output {
+      flex: 1;
+      padding: 16px 18px;
+      overflow-y: auto;
+      font-family: var(--mono);
+      font-size: 12.5px;
+      line-height: 1.7;
+      color: rgba(255,255,255,0.7);
+      max-height: 380px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .demo-output::-webkit-scrollbar { width: 6px; }
+    .demo-output::-webkit-scrollbar-track { background: transparent; }
+    .demo-output::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,0.1); border-radius: 3px;
+    }
+    .demo-output { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.1) transparent; }
+    .demo-output .line-cmd { color: var(--accent2); }
+    .demo-output .line-ok { color: #22dd55; }
+    .demo-output .line-warn { color: #ffbd2e; }
+    .demo-output .line-err { color: #ff5f56; }
+    .demo-output .line-info { color: rgba(255,255,255,0.45); }
+    .demo-output .line-show { color: var(--accent); }
+    .demo-output .line-json { color: rgba(255,255,255,0.62); }
+
+    /* ── Input bar ───────────────────────────────────── */
+    .demo-input-bar {
+      display: flex; gap: 0;
+      border-top: 1px solid var(--border);
+    }
+    .demo-prompt {
+      font-family: var(--mono); font-size: 13px;
+      color: var(--accent2);
+      padding: 14px 0 14px 18px;
+      user-select: none;
+    }
+    .demo-input {
+      flex: 1;
+      background: transparent;
+      border: none; outline: none;
+      font-family: var(--mono); font-size: 13px;
+      color: var(--fg);
+      padding: 14px 18px 14px 8px;
+    }
+    .demo-input::placeholder { color: rgba(255,255,255,0.2); }
+
+    /* ── Quick commands ──────────────────────────────── */
+    .demo-quick {
+      display: flex; flex-wrap: wrap; gap: 8px;
+      margin-bottom: 32px;
+    }
+    .demo-qbtn {
+      font-family: var(--mono); font-size: 10.5px;
+      letter-spacing: 0.04em;
+      padding: 7px 14px; border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: rgba(255,255,255,0.7);
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s, background 0.2s;
+    }
+    .demo-qbtn:hover {
+      border-color: rgba(255,255,255,0.25);
+      color: var(--fg);
+      background: var(--surface-hi);
+    }
+
+    /* ── How it works note ───────────────────────────── */
+    .demo-note {
+      padding: 20px 24px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--surface);
+      margin-bottom: 48px;
+    }
+    .demo-note-title {
+      font-family: var(--mono); font-size: 10px;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--accent2);
+      margin-bottom: 10px;
+    }
+    .demo-note p {
+      font-size: 14px;
+      line-height: 1.7;
+      color: rgba(255,255,255,0.7);
+      margin: 0;
+    }
+
+    /* ── Feature cards ───────────────────────────────── */
+    .feat-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 48px;
+    }
+    .feat-card {
+      padding: 20px 24px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--surface);
+    }
+    .feat-name {
+      font-family: var(--mono); font-size: 13px;
+      font-weight: 500;
+      color: var(--accent2);
+      margin-bottom: 6px;
+    }
+    .feat-desc {
+      font-size: 13px;
+      line-height: 1.6;
+      color: rgba(255,255,255,0.6);
+    }
+
+    /* ── Contributions list ──────────────────────────── */
+    .contrib-list {
+      list-style: none;
+      margin-bottom: 48px;
+    }
+    .contrib-list li {
+      position: relative;
+      padding: 14px 0 14px 24px;
+      font-size: 15px;
+      line-height: 1.7;
+      color: rgba(255,255,255,0.75);
+      border-bottom: 1px solid var(--border);
+    }
+    .contrib-list li::before {
+      content: '\2192';
+      position: absolute;
+      left: 0;
+      color: var(--accent2);
+      font-family: var(--mono);
+    }
+    .contrib-list li strong { color: #fff; font-weight: 600; }
+
+    @media (max-width: 760px) {
+      .feat-grid { grid-template-columns: 1fr; }
+      .cmd-grid { grid-template-columns: 1fr; }
+      .demo-panels { grid-template-columns: 1fr; }
+      .demo-panel + .demo-panel { border-left: none; border-top: 1px solid var(--border); }
+      .arch-stage { min-width: 0; width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="nav">
+    <a class="nav-logo" href="index.html" data-cursor="Home">SZ</a>
+    <div class="nav-links">
+      <a class="nav-link" href="work.html" data-cursor="Work">Work</a>
+      <a class="nav-link" href="experience.html" data-cursor="Experience">Experience</a>
+      <a class="nav-link" href="about.html" data-cursor="About">About</a>
+      <a class="nav-link" href="photos.html" data-cursor="Photos">Photos</a>
+      <a class="nav-link" href="contact.html" data-cursor="Contact">Contact</a>
+    </div>
+  </nav>
+
+  <main class="page-inner">
+
+    <!-- Hero -->
+    <section class="lamp-hero">
+      <div class="lamp-fx" aria-hidden="true">
+        <div class="lamp-cone lamp-cone-l"></div>
+        <div class="lamp-cone lamp-cone-r"></div>
+        <div class="lamp-glow"></div>
+        <div class="lamp-hotspot"></div>
+        <div class="lamp-bar"></div>
+      </div>
+      <h2 class="lamp-title">URL Shortener</h2>
+      <span class="lamp-sub">Flask REST API · Caching &amp; Analytics</span>
+    </section>
+
+    <!-- Overview -->
+    <section>
+      <div class="section-label">Overview</div>
+      <p class="proj-desc">
+        A <strong>URL shortener REST API</strong> built with <strong>Flask</strong>, <strong>PostgreSQL</strong>, and <strong>Redis</strong> — generating short links, handling tracked redirects, and serving click analytics. The design leans on <strong>cache-aside lookups</strong>, <strong>composite database indexing</strong>, <strong>async click recording</strong>, and <strong>Redis-backed rate limiting</strong> to stay read-fast under load.
+      </p>
+
+      <div class="proj-links">
+        <a class="proj-link" href="https://github.com/BigMuscleSmoe/url-shortener" target="_blank" rel="noopener" data-cursor="GitHub">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          <span>View on GitHub</span>
+        </a>
+      </div>
+
+      <div class="proj-concepts">
+        <span class="proj-chip">Flask</span>
+        <span class="proj-chip">PostgreSQL</span>
+        <span class="proj-chip">Redis</span>
+        <span class="proj-chip">Gunicorn</span>
+        <span class="proj-chip">Docker Compose</span>
+        <span class="proj-chip">Flask-Limiter</span>
+        <span class="proj-chip">REST API</span>
+        <span class="proj-chip">pytest</span>
+      </div>
+    </section>
+
+    <!-- Architecture -->
+    <section>
+      <div class="section-label">Architecture</div>
+      <h3 class="section-title">System Design</h3>
+      <div class="arch">
+        <div class="arch-tier">
+          <div class="arch-stage">
+            <span class="arch-stage-name">Client</span>
+            <span class="arch-stage-desc">HTTP / curl</span>
+          </div>
+        </div>
+
+        <div class="arch-flow">↓ &nbsp; REST request &nbsp; ↓</div>
+
+        <div class="arch-tier">
+          <div class="arch-stage">
+            <span class="arch-stage-name">Flask + Gunicorn</span>
+            <span class="arch-stage-desc">Routing · rate limiting · 302 redirects · async click writes</span>
+          </div>
+        </div>
+
+        <div class="arch-flow">↓ &nbsp; cache-aside &nbsp; · &nbsp; persistence &nbsp; ↓</div>
+
+        <div class="arch-tier arch-stores">
+          <div class="arch-stage">
+            <span class="arch-stage-name">Redis</span>
+            <span class="arch-stage-desc">Code cache (24h TTL) · negative cache · limiter store</span>
+          </div>
+          <div class="arch-stage">
+            <span class="arch-stage-name">PostgreSQL</span>
+            <span class="arch-stage-desc">Links table · indexed click log</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Endpoint Reference -->
+    <section>
+      <div class="section-label">Endpoints</div>
+      <div class="cmd-grid">
+        <div class="cmd-card">
+          <div class="cmd-name">POST /api/links</div>
+          <div class="cmd-desc">Create a short link from a JSON <code>{ "url": ... }</code> body → <strong>201</strong> with code + short URL. Rate-limited to 10/min per IP (<strong>429</strong> on excess).</div>
+        </div>
+        <div class="cmd-card">
+          <div class="cmd-name">GET /{code}</div>
+          <div class="cmd-desc">Redirect to the original URL via <strong>302 Found</strong> so every visit is tracked. <strong>404</strong> if the code is unknown.</div>
+        </div>
+        <div class="cmd-card">
+          <div class="cmd-name">GET /api/links/{code}/stats</div>
+          <div class="cmd-desc">Analytics: total clicks, daily breakdown, and top referrers with their click counts.</div>
+        </div>
+        <div class="cmd-card">
+          <div class="cmd-name">docker compose up --build</div>
+          <div class="cmd-desc">Brings up Flask, PostgreSQL, and Redis together at <code>localhost:8080</code>.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Interactive Demo -->
+    <section>
+      <div class="section-label">Interactive Demo</div>
+      <h3 class="section-title">Try the API in the browser</h3>
+
+      <div class="demo-quick" id="quick-btns">
+        <button class="demo-qbtn" data-cmd="shorten https://github.com/BigMuscleSmoe">shorten https://github.com/BigMuscleSmoe</button>
+        <button class="demo-qbtn" data-cmd="visit">visit (redirect)</button>
+        <button class="demo-qbtn" data-cmd="visit">visit again</button>
+        <button class="demo-qbtn" data-cmd="stats">stats</button>
+        <button class="demo-qbtn" data-cmd="help">help</button>
+      </div>
+
+      <div class="demo-wrap">
+        <div class="demo-panels">
+          <div class="demo-panel">
+            <div class="demo-panel-head">
+              <span class="demo-dot demo-dot-r"></span>
+              <span class="demo-dot demo-dot-y"></span>
+              <span class="demo-dot demo-dot-g"></span>
+              <span class="demo-panel-label">Client — curl</span>
+            </div>
+            <div class="demo-output" id="client-out">
+              <div class="line-info">Type a command below or use the quick buttons.</div>
+              <div class="line-info">Try: shorten &lt;url&gt; · visit · stats</div>
+            </div>
+          </div>
+          <div class="demo-panel">
+            <div class="demo-panel-head">
+              <span class="demo-dot demo-dot-r"></span>
+              <span class="demo-dot demo-dot-y"></span>
+              <span class="demo-dot demo-dot-g"></span>
+              <span class="demo-panel-label">Server — Flask @ localhost:8080</span>
+            </div>
+            <div class="demo-output" id="server-out">
+              <div class="line-info">Flask app started · Redis connected · DB migrated</div>
+            </div>
+          </div>
+        </div>
+        <div class="demo-input-bar">
+          <span class="demo-prompt">›</span>
+          <input class="demo-input" id="demo-input" type="text" placeholder="Type a command (e.g. shorten https://example.com)" autocomplete="off" spellcheck="false" />
+        </div>
+      </div>
+
+      <div class="demo-note">
+        <div class="demo-note-title">How it works</div>
+        <p>The real service is <strong style="color:var(--fg)">Flask + PostgreSQL + Redis</strong> running in Docker, with codes cached for fast redirects and clicks written asynchronously. This browser demo reimplements the same request/response contract in JavaScript — base62 code generation, cache-aside lookups, 302 redirects, async click recording, rate limiting, and the stats aggregation — entirely client-side. No network involved.</p>
+      </div>
+    </section>
+
+    <!-- Features -->
+    <section>
+      <div class="section-label">Features</div>
+      <div class="feat-grid">
+        <div class="feat-card reveal">
+          <div class="feat-name">Short Code Strategy</div>
+          <div class="feat-desc">Seven random base62 characters (~3.5 trillion combinations) with collision-retry. Codes stay unpredictable so they don't leak usage patterns.</div>
+        </div>
+        <div class="feat-card reveal d1">
+          <div class="feat-name">Tracked Redirects</div>
+          <div class="feat-desc">302 Found (not 301) ensures every visit reaches the server so each click is counted, instead of being cached permanently by the browser.</div>
+        </div>
+        <div class="feat-card reveal d2">
+          <div class="feat-name">Redis Caching</div>
+          <div class="feat-desc">Cache-aside redirect lookups with a 24-hour TTL and a 5-minute negative cache for unknown codes — keeping hot paths off the database.</div>
+        </div>
+        <div class="feat-card reveal d3">
+          <div class="feat-name">Async Click Writes</div>
+          <div class="feat-desc">Click rows are inserted on background threads, letting redirect responses return immediately without waiting on the database.</div>
+        </div>
+        <div class="feat-card reveal d4">
+          <div class="feat-name">Analytics</div>
+          <div class="feat-desc">Total clicks, daily breakdown, and top referrers, served by a composite index on <code>clicks(link_id, clicked_at)</code> for read-heavy queries.</div>
+        </div>
+        <div class="feat-card reveal d5">
+          <div class="feat-name">Rate Limiting</div>
+          <div class="feat-desc">Flask-Limiter backed by Redis enforces 10 creates/min per IP across multiple app instances, returning 429 on excess.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- What I Built -->
+    <section>
+      <div class="section-label">Highlights</div>
+      <h3 class="section-title">What I Built</h3>
+      <ul class="contrib-list">
+        <li>Designed a <strong>Flask REST API</strong> for link creation, tracked redirects, and click analytics, served by Gunicorn behind Docker Compose</li>
+        <li>Implemented <strong>base62 code generation</strong> with collision-retry and a unique constraint on the code column</li>
+        <li>Built <strong>cache-aside redirect lookups</strong> in Redis with a 24-hour TTL and a short negative cache for unknown codes</li>
+        <li>Moved click recording onto <strong>background threads</strong> so redirects return without blocking on database writes</li>
+        <li>Tuned analytics with a <strong>composite index</strong> on <code>clicks(link_id, clicked_at)</code> for total, daily, and top-referrer queries</li>
+        <li>Added <strong>Redis-backed rate limiting</strong> (10/min per IP) and <strong>pytest</strong> tests running against an in-memory SQLite database</li>
+      </ul>
+    </section>
+
+    <footer class="page-footer">
+      <span class="footer-copy">© <span id="year"></span> Steven Zhang</span>
+      <a class="footer-copy" href="work.html" data-cursor="Work" style="text-decoration: none;">← Work</a>
+    </footer>
+  </main>
+
+  <script src="script.js"></script>
+  <script>
+  (function() {
+    // ── In-memory "server" state ──────────────────────
+    var links = {};          // code -> { url, clicks: [{ ts, referrer }] }
+    var lastCode = null;
+    var createTimes = [];     // timestamps (ms) of recent creates, for rate limiting
+    var RATE_MAX = 10;        // creates per window
+    var RATE_WINDOW = 60000;  // 60s
+
+    var REFERRERS = ['google.com', 'twitter.com', 't.co', 'reddit.com', 'direct', 'linkedin.com'];
+    var BASE62 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+    var clientOut = document.getElementById('client-out');
+    var serverOut = document.getElementById('server-out');
+    var input = document.getElementById('demo-input');
+
+    function addLine(el, text, cls) {
+      var d = document.createElement('div');
+      if (cls) d.className = cls;
+      d.textContent = text;
+      el.appendChild(d);
+      el.scrollTop = el.scrollHeight;
+    }
+
+    function genCode() {
+      var code;
+      do {
+        code = '';
+        for (var i = 0; i < 7; i++) {
+          code += BASE62[Math.floor(Math.random() * BASE62.length)];
+        }
+      } while (links[code]); // collision retry
+      return code;
+    }
+
+    function today(offsetDays) {
+      var d = new Date();
+      d.setDate(d.getDate() - (offsetDays || 0));
+      return d.toISOString().slice(0, 10);
+    }
+
+    var USAGE = [
+      'shorten <url>   - Create a short link (POST /api/links)',
+      'visit [code]    - Follow a short link (GET /{code})',
+      'stats [code]    - Show analytics (GET /api/links/{code}/stats)',
+      'help            - Show this help'
+    ];
+
+    // ── Command dispatch ──────────────────────────────
+    function processCommand(raw) {
+      raw = raw.trim();
+      if (!raw) return;
+
+      var tokens = raw.split(/\s+/);
+      var command = tokens[0].toLowerCase();
+      var arg = tokens.slice(1).join(' ').trim();
+
+      if (command === 'help') {
+        addLine(clientOut, '> help', 'line-cmd');
+        addLine(clientOut, 'usage:', 'line-info');
+        USAGE.forEach(function(l) { addLine(clientOut, '  ' + l, 'line-info'); });
+        return;
+      }
+
+      if (command === 'shorten') return doShorten(arg);
+      if (command === 'visit')   return doVisit(arg || lastCode);
+      if (command === 'stats')   return doStats(arg || lastCode);
+
+      addLine(clientOut, '> ' + raw, 'line-cmd');
+      addLine(clientOut, "Unknown command: '" + command + "'", 'line-err');
+      USAGE.forEach(function(l) { addLine(clientOut, '  ' + l, 'line-info'); });
+    }
+
+    // ── POST /api/links ───────────────────────────────
+    function doShorten(url) {
+      url = (url || '').trim();
+      addLine(clientOut, "$ curl -X POST localhost:8080/api/links \\", 'line-cmd');
+      addLine(clientOut, "    -d '{\"url\": \"" + (url || '') + "\"}'", 'line-cmd');
+
+      if (!url) {
+        addLine(serverOut, 'POST /api/links  ->  400 Bad Request', 'line-warn');
+        addLine(serverOut, '  { "error": "url is required" }', 'line-json');
+        addLine(clientOut, '400 Bad Request: url is required', 'line-err');
+        return;
+      }
+
+      // Rate limiting (Flask-Limiter: 10/min per IP)
+      var now = Date.now();
+      createTimes = createTimes.filter(function(t) { return now - t < RATE_WINDOW; });
+      if (createTimes.length >= RATE_MAX) {
+        addLine(serverOut, 'POST /api/links  ->  429 Too Many Requests', 'line-warn');
+        addLine(serverOut, '  { "error": "rate limit exceeded (10/min)" }', 'line-json');
+        addLine(clientOut, '429 Too Many Requests — slow down (10/min per IP)', 'line-warn');
+        return;
+      }
+      createTimes.push(now);
+
+      var code = genCode();           // no dedup — identical URLs get distinct codes
+      links[code] = { url: url, clicks: [] };
+      lastCode = code;
+      var shortUrl = 'localhost:8080/' + code;
+
+      addLine(serverOut, 'POST /api/links  ->  201 Created', 'line-ok');
+      addLine(serverOut, '  { "code": "' + code + '", "short_url": "http://' + shortUrl + '" }', 'line-json');
+      addLine(clientOut, '201 Created  →  ' + shortUrl, 'line-ok');
+      addLine(clientOut, '  (active code is now "' + code + '")', 'line-info');
+    }
+
+    // ── GET /{code}  (302 redirect, async click write) ─
+    function doVisit(code) {
+      code = (code || '').trim();
+      if (!code) {
+        addLine(clientOut, '$ curl -i localhost:8080/', 'line-cmd');
+        addLine(clientOut, 'No code yet — run "shorten <url>" first.', 'line-warn');
+        return;
+      }
+      addLine(clientOut, '$ curl -i localhost:8080/' + code, 'line-cmd');
+
+      var link = links[code];
+      if (!link) {
+        addLine(serverOut, 'GET /' + code + '  ->  404 Not Found  (negative-cached 5m)', 'line-warn');
+        addLine(clientOut, '404 Not Found: no such code', 'line-err');
+        return;
+      }
+
+      // Redis cache-aside: first lookup misses, subsequent ones hit
+      var cacheHit = link._cached === true;
+      link._cached = true;
+      addLine(serverOut, 'GET /' + code + '  ->  302 Found   [redis ' + (cacheHit ? 'HIT' : 'MISS → set 24h TTL') + ']', cacheHit ? 'line-ok' : 'line-info');
+      addLine(serverOut, '  Location: ' + link.url, 'line-json');
+      addLine(clientOut, '302 Found  →  Location: ' + link.url, 'line-show');
+
+      // Async click recording (background thread)
+      var referrer = REFERRERS[Math.floor(Math.random() * REFERRERS.length)];
+      setTimeout(function() {
+        link.clicks.push({ ts: Date.now(), referrer: referrer, day: today(Math.floor(Math.random() * 3)) });
+        addLine(serverOut, '  · click recorded async (ref: ' + referrer + ')', 'line-info');
+      }, 120);
+    }
+
+    // ── GET /api/links/{code}/stats ───────────────────
+    function doStats(code) {
+      code = (code || '').trim();
+      if (!code) {
+        addLine(clientOut, '$ curl localhost:8080/api/links//stats', 'line-cmd');
+        addLine(clientOut, 'No code yet — run "shorten <url>" first.', 'line-warn');
+        return;
+      }
+      addLine(clientOut, '$ curl localhost:8080/api/links/' + code + '/stats', 'line-cmd');
+
+      var link = links[code];
+      if (!link) {
+        addLine(serverOut, 'GET /api/links/' + code + '/stats  ->  404 Not Found', 'line-warn');
+        addLine(clientOut, '404 Not Found: no such code', 'line-err');
+        return;
+      }
+
+      // daily breakdown
+      var byDay = {};
+      var byRef = {};
+      link.clicks.forEach(function(c) {
+        byDay[c.day] = (byDay[c.day] || 0) + 1;
+        byRef[c.referrer] = (byRef[c.referrer] || 0) + 1;
+      });
+      var days = Object.keys(byDay).sort();
+      var refs = Object.keys(byRef).sort(function(a, b) { return byRef[b] - byRef[a]; }).slice(0, 5);
+
+      addLine(serverOut, 'GET /api/links/' + code + '/stats  ->  200 OK', 'line-ok');
+      addLine(serverOut, '  composite index scan on clicks(link_id, clicked_at)', 'line-info');
+
+      addLine(clientOut, '200 OK', 'line-ok');
+      addLine(clientOut, '  total_clicks: ' + link.clicks.length, 'line-show');
+      if (days.length) {
+        addLine(clientOut, '  daily:', 'line-show');
+        days.forEach(function(d) { addLine(clientOut, '    ' + d + '  ' + byDay[d], 'line-json'); });
+      }
+      if (refs.length) {
+        addLine(clientOut, '  top_referrers:', 'line-show');
+        refs.forEach(function(r) { addLine(clientOut, '    ' + r + '  ' + byRef[r], 'line-json'); });
+      }
+      if (!link.clicks.length) {
+        addLine(clientOut, '  (no clicks yet — try "visit")', 'line-info');
+      }
+    }
+
+    // ── Input handling ────────────────────────────────
+    input.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        processCommand(input.value);
+        input.value = '';
+      }
+    });
+
+    document.getElementById('quick-btns').addEventListener('click', function(e) {
+      var btn = e.target.closest('[data-cmd]');
+      if (!btn) return;
+      processCommand(btn.getAttribute('data-cmd'));
+      input.focus();
+    });
+  })();
+  </script>
+</body>
+</html>
