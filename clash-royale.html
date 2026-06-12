@@ -1,0 +1,444 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Clash Royale — Ultimate Champion — Steven Zhang</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    :root {
+      --cr-gold: #f5c518;
+      --cr-purple: #8b3ff2;
+      --cr-magenta: #e040fb;
+    }
+
+    /* ── Tint the lamp hero royal gold ───────────────── */
+    .lamp-cone-l { background: conic-gradient(from 70deg at center top, rgba(245,197,24,0.85) 0%, transparent 50%, transparent 100%); }
+    .lamp-cone-r { background: conic-gradient(from 290deg at center top, transparent 0%, transparent 50%, rgba(224,64,251,0.85) 100%); }
+    .lamp-glow { background: radial-gradient(ellipse 55% 100% at center top, rgba(245,197,24,0.45) 0%, rgba(224,64,251,0.16) 35%, rgba(139,63,242,0.05) 65%, transparent 85%); }
+    .lamp-hotspot { background: #ffd95e; }
+    .lamp-bar { background: #ffd95e; box-shadow: 0 0 14px rgba(255,217,94,0.9), 0 0 36px rgba(245,197,24,0.45); }
+    .lamp-title { background: linear-gradient(135deg, #fff3c4 0%, #f5c518 60%, #e040fb 140%); -webkit-background-clip: text; background-clip: text; }
+
+    /* ── Rank statement: a royal card ────────────────── */
+    .cr-statement {
+      display: flex; align-items: center; gap: 36px;
+      padding: 40px 44px;
+      margin-bottom: 56px;
+      border-radius: 22px;
+      border: 1px solid rgba(245,197,24,0.35);
+      background:
+        radial-gradient(120% 160% at 0% 0%, rgba(224,64,251,0.12) 0%, transparent 50%),
+        radial-gradient(120% 160% at 100% 100%, rgba(245,197,24,0.1) 0%, transparent 50%),
+        rgba(255,255,255,0.02);
+      position: relative;
+      overflow: hidden;
+    }
+    .cr-statement::before {
+      content: '';
+      position: absolute; inset: 6px;
+      border-radius: 16px;
+      border: 1px dashed rgba(245,197,24,0.2);
+      pointer-events: none;
+    }
+    .cr-badge { flex-shrink: 0; filter: drop-shadow(0 0 26px rgba(224,64,251,0.45)); }
+    .cr-rank-name {
+      font-size: clamp(34px, 5.4vw, 58px);
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      line-height: 1.05;
+    }
+    .cr-rank-name em {
+      font-style: normal;
+      background: linear-gradient(120deg, #f9e27a, #f5c518 55%, #e89b0c);
+      -webkit-background-clip: text; background-clip: text;
+      color: transparent;
+    }
+    .cr-rank-sub {
+      font-family: var(--mono); font-size: 12px;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--cr-magenta);
+      margin-top: 14px;
+    }
+
+    /* ── Section headers ─────────────────────────────── */
+    .section-label {
+      font-family: var(--mono); font-size: 10px;
+      letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--cr-gold);
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 700; letter-spacing: -0.03em;
+      margin-bottom: 24px;
+    }
+
+    /* ── Stat grid ───────────────────────────────────── */
+    .cr-stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 64px;
+    }
+    .cr-stat {
+      padding: 26px 22px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: var(--surface);
+      transition: border-color 0.3s, background 0.3s;
+    }
+    .cr-stat:hover { border-color: rgba(245,197,24,0.45); background: var(--surface-hi); }
+    .cr-stat-num {
+      font-size: clamp(26px, 3.4vw, 38px);
+      font-weight: 700; letter-spacing: -0.02em;
+      line-height: 1.1;
+    }
+    .cr-stat-num span { color: var(--cr-gold); }
+    .cr-stat-label {
+      font-family: var(--mono); font-size: 10.5px;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 10px;
+      line-height: 1.6;
+    }
+
+    /* ── Copy ────────────────────────────────────────── */
+    .cr-copy {
+      font-size: clamp(16px, 2vw, 18px);
+      line-height: 1.8;
+      color: rgba(255,255,255,0.78);
+      max-width: 68ch;
+      margin-bottom: 22px;
+    }
+    .cr-copy strong { color: #fff; font-weight: 600; }
+    .cr-copy em { font-style: normal; color: var(--cr-gold); font-weight: 600; }
+    .cr-sources {
+      font-family: var(--mono); font-size: 10.5px;
+      color: var(--dim);
+      letter-spacing: 0.04em;
+      margin-bottom: 64px;
+    }
+    .cr-sources a { color: rgba(255,255,255,0.45); text-decoration: underline; text-underline-offset: 3px; }
+    .cr-sources a:hover { color: var(--cr-gold); }
+
+    /* ── Proof gallery ───────────────────────────────── */
+    .cr-proofs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 64px;
+    }
+    .cr-proof {
+      display: block;
+      border: 1px solid rgba(245,197,24,0.22);
+      border-radius: 18px;
+      background:
+        radial-gradient(140% 100% at 50% 0%, rgba(139,63,242,0.1) 0%, transparent 55%),
+        #101019;
+      overflow: hidden;
+      transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
+    }
+    .cr-proof:hover {
+      border-color: rgba(245,197,24,0.55);
+      transform: translateY(-4px);
+      box-shadow: 0 16px 44px rgba(224,64,251,0.12);
+    }
+    .cr-proof img {
+      display: block;
+      width: 100%;
+      height: 470px;
+      object-fit: contain;
+      padding: 18px 18px 0;
+      box-sizing: border-box;
+    }
+    .cr-proof-cap {
+      display: flex; align-items: baseline; gap: 10px;
+      padding: 16px 22px 18px;
+    }
+    .cr-proof-tag {
+      font-family: var(--mono); font-size: 9.5px;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--cr-gold);
+      flex-shrink: 0;
+    }
+    .cr-proof-text {
+      font-size: 13px; line-height: 1.6;
+      color: rgba(255,255,255,0.6);
+    }
+    .cr-proof-text strong { color: #fff; }
+
+    /* ── Skill cards ─────────────────────────────────── */
+    .cr-skills {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 64px;
+    }
+    .cr-skill {
+      padding: 24px 26px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: var(--surface);
+      border-top: 2px solid rgba(245,197,24,0.45);
+    }
+    .cr-skill-name {
+      font-family: var(--mono); font-size: 12px;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .cr-skill-desc {
+      font-size: 13.5px; line-height: 1.7;
+      color: rgba(255,255,255,0.6);
+    }
+
+    /* ── League road ─────────────────────────────────── */
+    .cr-road {
+      display: flex; flex-wrap: wrap; gap: 8px;
+      align-items: stretch;
+      margin-bottom: 14px;
+    }
+    .cr-league {
+      flex: 1; min-width: 120px;
+      padding: 18px 12px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--surface);
+      text-align: center;
+      font-family: var(--mono); font-size: 11px;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      color: var(--muted);
+    }
+    .cr-league small {
+      display: block;
+      font-size: 9px;
+      margin-top: 7px;
+      color: var(--dim);
+    }
+    .cr-league-uc {
+      color: #1c1304;
+      font-weight: 500;
+      background: linear-gradient(135deg, #fde7ff 0%, #e879f9 30%, #f5c518 100%);
+      border-color: var(--cr-gold);
+      box-shadow: 0 0 28px rgba(224,64,251,0.3);
+    }
+    .cr-league-uc small { color: rgba(28,19,4,0.65); }
+    .cr-road-note {
+      font-family: var(--mono); font-size: 10.5px;
+      color: var(--dim);
+      letter-spacing: 0.04em;
+      margin-bottom: 64px;
+    }
+
+    /* ── External link ───────────────────────────────── */
+    .cr-links { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 64px; }
+    .cr-link {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: var(--mono); font-size: 11px;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      padding: 10px 20px; border-radius: 999px;
+      border: 1px solid rgba(245,197,24,0.3);
+      background: rgba(245,197,24,0.07);
+      color: var(--cr-gold);
+      transition: background 0.2s, border-color 0.2s, color 0.2s;
+      text-decoration: none;
+    }
+    .cr-link:hover {
+      background: rgba(245,197,24,0.16);
+      border-color: rgba(245,197,24,0.55);
+      color: #fff;
+    }
+
+    @media (max-width: 860px) {
+      .cr-stats { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 760px) {
+      .cr-statement { flex-direction: column; text-align: center; gap: 24px; padding: 32px 24px; }
+      .cr-proofs { grid-template-columns: 1fr; }
+      .cr-proof img { height: 420px; }
+      .cr-skills { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="nav">
+    <a class="nav-logo" href="index.html" data-cursor="Home">SZ</a>
+    <div class="nav-links">
+      <a class="nav-link" href="work.html" data-cursor="Work">Work</a>
+      <a class="nav-link" href="experience.html" data-cursor="Experience">Experience</a>
+      <a class="nav-link" href="about.html" data-cursor="About">About</a>
+      <a class="nav-link" href="photos.html" data-cursor="Photos">Photos</a>
+      <a class="nav-link" href="contact.html" data-cursor="Contact">Contact</a>
+    </div>
+  </nav>
+
+  <main class="page-inner">
+
+    <!-- Hero -->
+    <section class="lamp-hero">
+      <div class="lamp-fx" aria-hidden="true">
+        <div class="lamp-cone lamp-cone-l"></div>
+        <div class="lamp-cone lamp-cone-r"></div>
+        <div class="lamp-glow"></div>
+        <div class="lamp-hotspot"></div>
+        <div class="lamp-bar"></div>
+      </div>
+      <h2 class="lamp-title">Ultimate Champion</h2>
+      <span class="lamp-sub">Clash Royale · Path of Legends · World Rank #1661</span>
+    </section>
+
+    <!-- Rank statement -->
+    <div class="cr-statement fade-up d2">
+      <img class="cr-badge" src="image/logo-cr.png" alt="Clash Royale Ultimate Champion league badge" height="120" />
+      <div>
+        <div class="cr-rank-name"><em>Ultimate Champion</em></div>
+        <div class="cr-rank-sub">The final league. Finished #1661 in the world</div>
+      </div>
+    </div>
+
+    <!-- Rarity -->
+    <section>
+      <div class="section-label">♛ Rarity</div>
+      <h3 class="section-title">How rare is Ultimate Champion?</h3>
+      <div class="cr-stats">
+        <div class="cr-stat reveal">
+          <div class="cr-stat-num">#<span>1661</span></div>
+          <div class="cr-stat-label">Best-season world ranking</div>
+        </div>
+        <div class="cr-stat reveal d1">
+          <div class="cr-stat-num">2591</div>
+          <div class="cr-stat-label">Path of Legends rating</div>
+        </div>
+        <div class="cr-stat reveal d2">
+          <div class="cr-stat-num">&lt;1<span>%</span></div>
+          <div class="cr-stat-label">Of players ever reach the league</div>
+        </div>
+        <div class="cr-stat reveal d3">
+          <div class="cr-stat-num">5110</div>
+          <div class="cr-stat-label">Career battles won</div>
+        </div>
+      </div>
+
+      <p class="cr-copy reveal">
+        Ultimate Champion is the <strong>tenth and final league</strong> of Path of Legends, Clash Royale's ranked mode. There is nothing above it. Community estimates put the players who ever reach it at <em>well under 1%</em> of an active base in the tens of millions. But the league badge undersells this run: a best-season finish of <strong>#1661 in the world</strong> isn't "top 1%"; it's a four-digit position on a global leaderboard. And the screenshot shows it as both <strong>previous season and best season</strong>: the rank was reached, then held again.
+      </p>
+      <p class="cr-sources reveal">
+        sources: <a href="https://www.themecircle.net/what-percentage-of-players-reach-ultimate-champion-in-clash-royale/" target="_blank" rel="noopener">reach-rate estimates</a> · <a href="https://royaleapi.com/player/2JYR2RGJ" target="_blank" rel="noopener">RoyaleAPI profile</a>
+      </p>
+    </section>
+
+    <!-- CRL 20-Win Challenge -->
+    <section>
+      <div class="section-label">♛ Esports Gauntlet</div>
+      <h3 class="section-title">The CRL 20-Win Challenge badge</h3>
+      <div class="cr-stats">
+        <div class="cr-stat reveal">
+          <div class="cr-stat-num">20</div>
+          <div class="cr-stat-label">Wins required to complete the run</div>
+        </div>
+        <div class="cr-stat reveal d1">
+          <div class="cr-stat-num">2</div>
+          <div class="cr-stat-label">Losses allowed. The third ends the run</div>
+        </div>
+        <div class="cr-stat reveal d2">
+          <div class="cr-stat-num">~2<span>%</span></div>
+          <div class="cr-stat-label">Completion odds even at a 70% win rate</div>
+        </div>
+        <div class="cr-stat reveal d3">
+          <div class="cr-stat-num">CRL</div>
+          <div class="cr-stat-label">Completing it unlocks pro-league qualifiers</div>
+        </div>
+      </div>
+      <p class="cr-copy reveal">
+        This profile also carries the <strong>CRL 20-Win Challenge badge</strong>. The challenge is Supercell's official qualifying gauntlet for the <strong>Clash Royale League</strong>, the game's professional esports circuit: win <em>20 matches before taking 3 losses</em>, in a bracket where everyone entering is chasing a shot at the pro league. The math is what makes it brutal. A player who wins 70% of their matches, already elite, completes the full run only about <strong>2% of the time per attempt</strong>. Finishing it unlocks registration for the CRL qualification stages, and the badge is pinned permanently to the in-game profile and battle banner.
+      </p>
+      <p class="cr-sources reveal">
+        sources: <a href="https://supercell.com/en/games/clashroyale/blog/news/the-20-win-challenge-is-back-2/" target="_blank" rel="noopener">Supercell: the 20-Win Challenge</a> · <a href="https://help.royaleapi.com/en/badges_crl.html" target="_blank" rel="noopener">RoyaleAPI: CRL badges</a>
+      </p>
+    </section>
+
+    <!-- Proof -->
+    <section>
+      <div class="section-label">♛ Evidence</div>
+      <h3 class="section-title">Straight from the arena</h3>
+      <div class="cr-proofs">
+        <a class="cr-proof reveal" href="image/cr2.png" target="_blank" rel="noopener" data-cursor="Open">
+          <img src="image/cr2.png" alt="Clash Royale ranked screen showing Ultimate Champion at 2591 rating, world rank #1661, for both previous and best season" loading="lazy" />
+          <div class="cr-proof-cap">
+            <span class="cr-proof-tag">01 /</span>
+            <span class="cr-proof-text">Ranked record: <strong>Ultimate Champion · 2591 · #1661</strong> listed under both <strong>Previous Season</strong> and <strong>Best Season</strong>.</span>
+          </div>
+        </a>
+        <a class="cr-proof reveal d1" href="image/cr1.png" target="_blank" rel="noopener" data-cursor="Open">
+          <img src="image/cr1.png" alt="Clash Royale player profile with seasonal badge and 5110 battles won" loading="lazy" />
+          <div class="cr-proof-cap">
+            <span class="cr-proof-tag">02 /</span>
+            <span class="cr-proof-text">The profile behind it: player tag <strong>#2JYR2RGJ</strong> (matches the RoyaleAPI link below), <strong>5,110 battles won</strong>.</span>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <!-- What it demonstrates -->
+    <section>
+      <div class="section-label">♛ What it takes</div>
+      <h3 class="section-title">Chess at 3 minutes per game</h3>
+      <p class="cr-copy reveal">
+        Clash Royale looks casual and plays brutal: two players, one bridge, and an <strong>elixir economy that regenerates in real time</strong>. Every match at this level is a compressed exercise in resource management and prediction:
+      </p>
+      <div class="cr-skills">
+        <div class="cr-skill reveal">
+          <div class="cr-skill-name">Resource management</div>
+          <div class="cr-skill-desc">Elixir is a hard budget: every card spent is tempo given away. Top-ladder play means tracking your opponent's elixir count in your head while managing your own, every second of the match.</div>
+        </div>
+        <div class="cr-skill reveal d1">
+          <div class="cr-skill-name">Strategic planning</div>
+          <div class="cr-skill-desc">Deck building is metagame analysis: an 8-card system designed against the entire field. Climbing to Ultimate Champion means out-preparing opponents before the match even starts.</div>
+        </div>
+        <div class="cr-skill reveal d2">
+          <div class="cr-skill-name">Prediction &amp; adaptation</div>
+          <div class="cr-skill-desc">After the first 60 seconds you know their full deck, and they know yours. From there it's pure read-and-counter: baiting spells, predicting placements, adapting the win condition mid-game.</div>
+        </div>
+        <div class="cr-skill reveal d3">
+          <div class="cr-skill-name">Grinding the ladder honestly</div>
+          <div class="cr-skill-desc">A season at Ultimate Champion takes hundreds of matches against the best players in the world; 5,110 career wins of iteration sit behind that #1661 finish.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- League road -->
+    <section>
+      <div class="section-label">♛ The climb</div>
+      <h3 class="section-title">Path of Legends</h3>
+      <div class="cr-road reveal">
+        <div class="cr-league">Challenger<small>leagues 1–3</small></div>
+        <div class="cr-league">Master<small>leagues 4–6</small></div>
+        <div class="cr-league">Champion<small>league 7</small></div>
+        <div class="cr-league">Grand Champion<small>league 8</small></div>
+        <div class="cr-league">Royal Champion<small>league 9</small></div>
+        <div class="cr-league cr-league-uc">Ultimate Champion<small>league 10 · final</small></div>
+      </div>
+      <p class="cr-road-note">Ranked resets every season; staying in Ultimate Champion means re-climbing the road again and again. This run finished at #1661 with a 2591 rating.</p>
+    </section>
+
+    <!-- Links -->
+    <div class="cr-links">
+      <a class="cr-link" href="https://royaleapi.com/player/2JYR2RGJ" target="_blank" rel="noopener" data-cursor="Stats">
+        <span>Profile on RoyaleAPI</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+      </a>
+    </div>
+
+    <footer class="page-footer">
+      <span class="footer-copy">© <span id="year"></span> Steven Zhang</span>
+      <a class="footer-copy" href="about.html" data-cursor="About" style="text-decoration: none;">← About</a>
+    </footer>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

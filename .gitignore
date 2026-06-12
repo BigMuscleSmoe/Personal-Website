@@ -1,0 +1,37 @@
+# ── Project notes (local only — do not publish) ──
+PROJECT_NOTES.md
+
+# ── Claude Code / AI tooling (local) ──
+.claude/
+.agents/
+.playwright-mcp/
+skills-lock.json
+
+# ── OS junk ──
+.DS_Store
+Thumbs.db
+desktop.ini
+ehthumbs.db
+$RECYCLE.BIN/
+
+# ── Editor / IDE ──
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ── Dependencies / build (if ever added) ──
+node_modules/
+dist/
+build/
+.cache/
+
+# ── Env / secrets ──
+.env
+.env.*
+*.local
+
+# ── Logs ──
+*.log
+npm-debug.log*

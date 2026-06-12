@@ -1,0 +1,429 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Valorant — Radiant — Steven Zhang</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    :root {
+      --val-red: #ff4655;
+      --val-cream: #ece8e1;
+    }
+
+    /* ── Tint the lamp hero VALORANT red ─────────────── */
+    .lamp-cone-l { background: conic-gradient(from 70deg at center top, rgba(255,70,85,0.9) 0%, transparent 50%, transparent 100%); }
+    .lamp-cone-r { background: conic-gradient(from 290deg at center top, transparent 0%, transparent 50%, rgba(255,70,85,0.9) 100%); }
+    .lamp-glow { background: radial-gradient(ellipse 55% 100% at center top, rgba(255,70,85,0.5) 0%, rgba(255,70,85,0.18) 35%, rgba(255,70,85,0.04) 65%, transparent 85%); }
+    .lamp-hotspot { background: #ff8791; }
+    .lamp-bar { background: #ff8791; box-shadow: 0 0 14px rgba(255,135,145,0.9), 0 0 36px rgba(255,70,85,0.45); }
+    .lamp-title { background: linear-gradient(135deg, #ece8e1 0%, #ff4655 140%); -webkit-background-clip: text; background-clip: text; }
+
+    /* ── VALORANT-style cut-corner panel ─────────────── */
+    .vl-cut {
+      clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 18px 100%, 0 calc(100% - 18px));
+    }
+
+    /* ── Rank statement ──────────────────────────────── */
+    .vl-statement {
+      display: flex; align-items: center; gap: 36px;
+      padding: 40px 44px;
+      margin-bottom: 56px;
+      background:
+        linear-gradient(115deg, rgba(255,70,85,0.12) 0%, rgba(255,70,85,0.03) 45%, transparent 70%),
+        rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,70,85,0.25);
+      position: relative;
+      overflow: hidden;
+    }
+    .vl-statement::after {
+      content: '';
+      position: absolute; top: -40%; right: 8%;
+      width: 3px; height: 180%;
+      background: rgba(255,70,85,0.25);
+      transform: rotate(24deg);
+      pointer-events: none;
+    }
+    .vl-statement::before {
+      content: '';
+      position: absolute; top: -40%; right: 13%;
+      width: 12px; height: 180%;
+      background: rgba(255,70,85,0.08);
+      transform: rotate(24deg);
+      pointer-events: none;
+    }
+    .vl-badge { flex-shrink: 0; filter: drop-shadow(0 0 24px rgba(255,216,77,0.35)); }
+    .vl-rank-name {
+      font-size: clamp(40px, 6vw, 64px);
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      line-height: 1;
+      color: var(--val-cream);
+    }
+    .vl-rank-name em {
+      font-style: normal;
+      color: #ffd84d;
+      text-shadow: 0 0 30px rgba(255,216,77,0.4);
+    }
+    .vl-rank-sub {
+      font-family: var(--mono); font-size: 12px;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--val-red);
+      margin-top: 14px;
+    }
+
+    /* ── Section headers ─────────────────────────────── */
+    .section-label {
+      font-family: var(--mono); font-size: 10px;
+      letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--val-red);
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 700; letter-spacing: -0.03em;
+      margin-bottom: 24px;
+    }
+
+    /* ── Stat grid ───────────────────────────────────── */
+    .vl-stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 64px;
+    }
+    .vl-stat {
+      padding: 26px 22px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      transition: border-color 0.3s, background 0.3s;
+    }
+    .vl-stat:hover { border-color: rgba(255,70,85,0.4); background: var(--surface-hi); }
+    .vl-stat-num {
+      font-size: clamp(26px, 3.4vw, 38px);
+      font-weight: 700; letter-spacing: -0.02em;
+      color: var(--val-cream);
+      line-height: 1.1;
+    }
+    .vl-stat-num span { color: var(--val-red); }
+    .vl-stat-label {
+      font-family: var(--mono); font-size: 10.5px;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 10px;
+      line-height: 1.6;
+    }
+
+    /* ── Body copy ───────────────────────────────────── */
+    .vl-copy {
+      font-size: clamp(16px, 2vw, 18px);
+      line-height: 1.8;
+      color: rgba(255,255,255,0.78);
+      max-width: 68ch;
+      margin-bottom: 22px;
+    }
+    .vl-copy strong { color: #fff; font-weight: 600; }
+    .vl-copy em { font-style: normal; color: var(--val-red); font-weight: 600; }
+    .vl-sources {
+      font-family: var(--mono); font-size: 10.5px;
+      color: var(--dim);
+      letter-spacing: 0.04em;
+      margin-bottom: 64px;
+    }
+    .vl-sources a { color: rgba(255,255,255,0.45); text-decoration: underline; text-underline-offset: 3px; }
+    .vl-sources a:hover { color: var(--val-red); }
+
+    /* ── Proof gallery ───────────────────────────────── */
+    .vl-proofs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 64px;
+    }
+    .vl-proof {
+      display: block;
+      border: 1px solid var(--border);
+      background: #101318;
+      position: relative;
+      transition: border-color 0.3s, transform 0.3s;
+    }
+    .vl-proof:hover { border-color: rgba(255,70,85,0.5); transform: translateY(-4px); }
+    .vl-proof::before, .vl-proof::after {
+      content: '';
+      position: absolute;
+      width: 16px; height: 16px;
+      border-color: var(--val-red);
+      border-style: solid;
+      z-index: 2;
+    }
+    .vl-proof::before { top: -1px; left: -1px; border-width: 2px 0 0 2px; }
+    .vl-proof::after { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; }
+    .vl-proof img {
+      display: block;
+      width: 100%;
+      height: 460px;
+      object-fit: contain;
+      padding: 18px 18px 0;
+      box-sizing: border-box;
+    }
+    .vl-proof-cap {
+      display: flex; align-items: baseline; gap: 10px;
+      padding: 16px 20px 18px;
+    }
+    .vl-proof-tag {
+      font-family: var(--mono); font-size: 9.5px;
+      letter-spacing: 0.14em;
+      color: var(--val-red);
+      flex-shrink: 0;
+    }
+    .vl-proof-text {
+      font-size: 13px; line-height: 1.6;
+      color: rgba(255,255,255,0.6);
+    }
+
+    /* ── Skill list ──────────────────────────────────── */
+    .vl-skills {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 64px;
+    }
+    .vl-skill {
+      padding: 24px 26px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      border-left: 2px solid rgba(255,70,85,0.5);
+    }
+    .vl-skill-name {
+      font-family: var(--mono); font-size: 12px;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--val-cream);
+      margin-bottom: 10px;
+    }
+    .vl-skill-desc {
+      font-size: 13.5px; line-height: 1.7;
+      color: rgba(255,255,255,0.6);
+    }
+
+    /* ── Ladder ──────────────────────────────────────── */
+    .vl-ladder {
+      display: flex; flex-wrap: wrap; gap: 8px;
+      align-items: stretch;
+      margin-bottom: 14px;
+    }
+    .vl-tier {
+      flex: 1; min-width: 86px;
+      padding: 16px 10px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      text-align: center;
+      font-family: var(--mono); font-size: 11px;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--muted);
+    }
+    .vl-tier small {
+      display: block;
+      font-size: 9px;
+      margin-top: 7px;
+      color: var(--dim);
+      letter-spacing: 0.06em;
+    }
+    .vl-tier-radiant {
+      color: #16140c;
+      font-weight: 500;
+      background: linear-gradient(135deg, #fff7d6, #ffd84d 60%, #f4c12e);
+      border-color: #ffd84d;
+      box-shadow: 0 0 26px rgba(255,216,77,0.3);
+    }
+    .vl-tier-radiant small { color: rgba(22,20,12,0.65); }
+    .vl-ladder-note {
+      font-family: var(--mono); font-size: 10.5px;
+      color: var(--dim);
+      letter-spacing: 0.04em;
+      margin-bottom: 64px;
+    }
+
+    /* ── Retired note ────────────────────────────────── */
+    .vl-retired {
+      padding: 26px 30px;
+      border: 1px solid rgba(255,70,85,0.3);
+      background: rgba(255,70,85,0.05);
+      margin-bottom: 64px;
+    }
+    .vl-retired-title {
+      font-family: var(--mono); font-size: 10px;
+      letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--val-red);
+      margin-bottom: 10px;
+    }
+    .vl-retired p {
+      font-size: 14.5px; line-height: 1.75;
+      color: rgba(255,255,255,0.72);
+      margin: 0;
+    }
+    .vl-retired strong { color: #fff; }
+
+    @media (max-width: 860px) {
+      .vl-stats { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 760px) {
+      .vl-statement { flex-direction: column; text-align: center; gap: 24px; padding: 32px 24px; }
+      .vl-proofs { grid-template-columns: 1fr; }
+      .vl-proof img { height: 400px; }
+      .vl-skills { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="nav">
+    <a class="nav-logo" href="index.html" data-cursor="Home">SZ</a>
+    <div class="nav-links">
+      <a class="nav-link" href="work.html" data-cursor="Work">Work</a>
+      <a class="nav-link" href="experience.html" data-cursor="Experience">Experience</a>
+      <a class="nav-link" href="about.html" data-cursor="About">About</a>
+      <a class="nav-link" href="photos.html" data-cursor="Photos">Photos</a>
+      <a class="nav-link" href="contact.html" data-cursor="Contact">Contact</a>
+    </div>
+  </nav>
+
+  <main class="page-inner">
+
+    <!-- Hero -->
+    <section class="lamp-hero">
+      <div class="lamp-fx" aria-hidden="true">
+        <div class="lamp-cone lamp-cone-l"></div>
+        <div class="lamp-cone lamp-cone-r"></div>
+        <div class="lamp-glow"></div>
+        <div class="lamp-hotspot"></div>
+        <div class="lamp-bar"></div>
+      </div>
+      <h2 class="lamp-title">Radiant</h2>
+      <span class="lamp-sub">Valorant · Episode 4 Act 3 · Leaderboard #460</span>
+    </section>
+
+    <!-- Rank statement -->
+    <div class="vl-statement vl-cut fade-up d2">
+      <img class="vl-badge" src="image/logo-radiant.png" alt="Valorant Radiant rank icon" height="115" />
+      <div>
+        <div class="vl-rank-name">Radiant <em>#460</em></div>
+        <div class="vl-rank-sub">The rank you don't earn. You take it from someone</div>
+      </div>
+    </div>
+
+    <!-- Rarity -->
+    <section>
+      <div class="section-label">// Rarity</div>
+      <h3 class="section-title">How rare is Radiant?</h3>
+      <div class="vl-stats">
+        <div class="vl-stat vl-cut reveal">
+          <div class="vl-stat-num"><span>~500</span></div>
+          <div class="vl-stat-label">Hard cap on Radiant slots per region</div>
+        </div>
+        <div class="vl-stat vl-cut reveal d1">
+          <div class="vl-stat-num">0.03<span>%</span></div>
+          <div class="vl-stat-label">Of ranked players ever hold it</div>
+        </div>
+        <div class="vl-stat vl-cut reveal d2">
+          <div class="vl-stat-num">#<span>460</span></div>
+          <div class="vl-stat-label">Regional leaderboard position</div>
+        </div>
+        <div class="vl-stat vl-cut reveal d3">
+          <div class="vl-stat-num">E4<span>·</span>A3</div>
+          <div class="vl-stat-label">Episode 4 Act 3, 2022</div>
+        </div>
+      </div>
+
+      <p class="vl-copy reveal">
+        Radiant works differently from every other rank in Valorant. There is no points threshold you can grind past. It is a <strong>regional leaderboard hard-capped at roughly 500 players</strong>. To become Radiant, you have to <em>displace someone who is already there</em>, and the moment you stop winning, someone displaces you. Out of millions of ranked players per region, that puts Radiant at about <strong>0.03% of the player base</strong>, and #460 means holding a numbered seat among them.
+      </p>
+      <p class="vl-sources reveal">
+        sources: <a href="https://support-valorant.riotgames.com/hc/en-us/articles/4405964120339-Rank-Rating-RR-for-Immortal-and-Radiant-Ranks" target="_blank" rel="noopener">Riot Games: Immortal &amp; Radiant ranking</a> · <a href="https://www.esportstales.com/valorant/rank-distribution-and-percentage-of-players-by-tier" target="_blank" rel="noopener">Esports Tales rank distribution</a>
+      </p>
+    </section>
+
+    <!-- Proof -->
+    <section>
+      <div class="section-label">// Evidence</div>
+      <h3 class="section-title">The receipts</h3>
+      <div class="vl-proofs">
+        <a class="vl-proof reveal" href="image/val1.jpg" target="_blank" rel="noopener" data-cursor="Open">
+          <img src="image/val1.jpg" alt="Valorant Act Rank screen showing Radiant #460 for Episode 4 Act 3" loading="lazy" />
+          <div class="vl-proof-cap">
+            <span class="vl-proof-tag">01 /</span>
+            <span class="vl-proof-text">Act Rank for Episode 4 Act 3: the pyramid filled with Radiant-tier wins, sealed <strong style="color:#fff">RADIANT #460</strong>.</span>
+          </div>
+        </a>
+        <a class="vl-proof reveal d1" href="image/val2.jpg" target="_blank" rel="noopener" data-cursor="Open">
+          <img src="image/val2.jpg" alt="Valorant in-game profile card showing rank Radiant #460" loading="lazy" />
+          <div class="vl-proof-cap">
+            <span class="vl-proof-tag">02 /</span>
+            <span class="vl-proof-text">In-client profile card: the Radiant badge and live leaderboard number rendered on the account itself.</span>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <!-- What it demonstrates -->
+    <section>
+      <div class="section-label">// What it takes</div>
+      <h3 class="section-title">Aim is just the entry fee</h3>
+      <p class="vl-copy reveal">
+        Everyone at this level has near-perfect mechanics: flicks, crosshair placement, and recoil control are assumed. What separates a Radiant player is everything that happens <strong>between the gunfights</strong>:
+      </p>
+      <div class="vl-skills">
+        <div class="vl-skill reveal">
+          <div class="vl-skill-name">Decision-making at speed</div>
+          <div class="vl-skill-desc">Round economy, rotation timing, and utility usage are recalculated every few seconds against opponents doing the same. Wrong reads get punished instantly; there is no margin at the top of the ladder.</div>
+        </div>
+        <div class="vl-skill reveal d1">
+          <div class="vl-skill-name">Composure under pressure</div>
+          <div class="vl-skill-desc">Clutch rounds at Radiant are played against the best players in the region, with a leaderboard position on the line every single match. Staying calm and executing is the skill.</div>
+        </div>
+        <div class="vl-skill reveal d2">
+          <div class="vl-skill-name">Consistency, not a hot streak</div>
+          <div class="vl-skill-desc">Because the leaderboard is competitive, the rank decays the moment performance dips. Holding seat #460 means performing at that level day after day, not peaking once.</div>
+        </div>
+        <div class="vl-skill reveal d3">
+          <div class="vl-skill-name">Deliberate practice</div>
+          <div class="vl-skill-desc">Climbing from Iron-tier matchmaking to a numbered Radiant seat is thousands of hours of VOD review, aim training, and meta study, the same discipline as mastering any hard craft.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Ladder -->
+    <section>
+      <div class="section-label">// The climb</div>
+      <h3 class="section-title">Where it sits on the ladder</h3>
+      <div class="vl-ladder reveal">
+        <div class="vl-tier">Iron</div>
+        <div class="vl-tier">Bronze</div>
+        <div class="vl-tier">Silver</div>
+        <div class="vl-tier">Gold</div>
+        <div class="vl-tier">Platinum</div>
+        <div class="vl-tier">Diamond<small>top ~3%</small></div>
+        <div class="vl-tier">Immortal<small>top ~0.5%</small></div>
+        <div class="vl-tier vl-tier-radiant">Radiant<small>top 500 · 0.03%</small></div>
+      </div>
+      <p class="vl-ladder-note">ladder as of Episode 4 (2022) · each tier above Silver already cuts the surviving player pool roughly in half.</p>
+    </section>
+
+    <!-- Retired -->
+    <div class="vl-retired vl-cut reveal">
+      <div class="vl-retired-title">// Status: Retired</div>
+      <p>The account was sold after the Radiant climb. I walked away <strong>at peak rank</strong>. No tracker link survives the transfer, which is exactly why the screenshots above were taken. The rank is retired; the proof isn't.</p>
+    </div>
+
+    <footer class="page-footer">
+      <span class="footer-copy">© <span id="year"></span> Steven Zhang</span>
+      <a class="footer-copy" href="about.html" data-cursor="About" style="text-decoration: none;">← About</a>
+    </footer>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

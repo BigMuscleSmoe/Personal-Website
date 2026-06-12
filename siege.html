@@ -1,0 +1,447 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Rainbow Six Siege — Champion — Steven Zhang</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    :root {
+      --sg-orange: #ff7a1a;
+      --sg-crimson: #e8174f;
+    }
+
+    /* ── Tint the lamp hero Siege orange ─────────────── */
+    .lamp-cone-l { background: conic-gradient(from 70deg at center top, rgba(255,122,26,0.9) 0%, transparent 50%, transparent 100%); }
+    .lamp-cone-r { background: conic-gradient(from 290deg at center top, transparent 0%, transparent 50%, rgba(255,122,26,0.9) 100%); }
+    .lamp-glow { background: radial-gradient(ellipse 55% 100% at center top, rgba(255,122,26,0.5) 0%, rgba(255,122,26,0.18) 35%, rgba(255,122,26,0.04) 65%, transparent 85%); }
+    .lamp-hotspot { background: #ffb066; }
+    .lamp-bar { background: #ffb066; box-shadow: 0 0 14px rgba(255,176,102,0.9), 0 0 36px rgba(255,122,26,0.45); }
+    .lamp-title { background: linear-gradient(135deg, #e2e8f0 0%, #ff7a1a 140%); -webkit-background-clip: text; background-clip: text; }
+
+    /* ── Dossier frame: corner brackets ──────────────── */
+    .sg-frame { position: relative; }
+    .sg-frame::before, .sg-frame::after,
+    .sg-frame > .sg-corner::before, .sg-frame > .sg-corner::after {
+      content: '';
+      position: absolute;
+      width: 14px; height: 14px;
+      border-color: var(--sg-orange);
+      border-style: solid;
+      z-index: 2;
+      pointer-events: none;
+    }
+    .sg-frame::before { top: -1px; left: -1px; border-width: 2px 0 0 2px; }
+    .sg-frame::after { top: -1px; right: -1px; border-width: 2px 2px 0 0; }
+    .sg-frame > .sg-corner::before { bottom: -1px; left: -1px; border-width: 0 0 2px 2px; }
+    .sg-frame > .sg-corner::after { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; }
+
+    /* ── Rank statement / debrief header ─────────────── */
+    .sg-statement {
+      display: flex; align-items: center; gap: 36px;
+      padding: 40px 44px;
+      margin-bottom: 56px;
+      border: 1px solid rgba(255,122,26,0.3);
+      background:
+        repeating-linear-gradient(0deg, transparent 0 3px, rgba(255,255,255,0.012) 3px 4px),
+        linear-gradient(115deg, rgba(255,122,26,0.1) 0%, transparent 55%),
+        rgba(255,255,255,0.02);
+    }
+    .sg-badge { flex-shrink: 0; filter: drop-shadow(0 0 22px rgba(232,23,79,0.45)); }
+    .sg-rank-name {
+      font-size: clamp(40px, 6vw, 64px);
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      line-height: 1;
+    }
+    .sg-rank-name em {
+      font-style: normal;
+      color: var(--sg-crimson);
+      text-shadow: 0 0 28px rgba(232,23,79,0.45);
+    }
+    .sg-rank-sub {
+      font-family: var(--mono); font-size: 12px;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--sg-orange);
+      margin-top: 14px;
+    }
+    .sg-rank-meta {
+      font-family: var(--mono); font-size: 10.5px;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 8px;
+    }
+
+    /* ── Section headers ─────────────────────────────── */
+    .section-label {
+      font-family: var(--mono); font-size: 10px;
+      letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--sg-orange);
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 700; letter-spacing: -0.03em;
+      margin-bottom: 24px;
+    }
+
+    /* ── Stat grid ───────────────────────────────────── */
+    .sg-stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 64px;
+    }
+    .sg-stat {
+      padding: 26px 22px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      transition: border-color 0.3s, background 0.3s;
+    }
+    .sg-stat:hover { border-color: rgba(255,122,26,0.45); background: var(--surface-hi); }
+    .sg-stat-num {
+      font-size: clamp(26px, 3.4vw, 38px);
+      font-weight: 700; letter-spacing: -0.02em;
+      line-height: 1.1;
+    }
+    .sg-stat-num span { color: var(--sg-orange); }
+    .sg-stat-label {
+      font-family: var(--mono); font-size: 10.5px;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 10px;
+      line-height: 1.6;
+    }
+
+    /* ── Copy ────────────────────────────────────────── */
+    .sg-copy {
+      font-size: clamp(16px, 2vw, 18px);
+      line-height: 1.8;
+      color: rgba(255,255,255,0.78);
+      max-width: 68ch;
+      margin-bottom: 22px;
+    }
+    .sg-copy strong { color: #fff; font-weight: 600; }
+    .sg-copy em { font-style: normal; color: var(--sg-orange); font-weight: 600; }
+    .sg-sources {
+      font-family: var(--mono); font-size: 10.5px;
+      color: var(--dim);
+      letter-spacing: 0.04em;
+      margin-bottom: 64px;
+    }
+    .sg-sources a { color: rgba(255,255,255,0.45); text-decoration: underline; text-underline-offset: 3px; }
+    .sg-sources a:hover { color: var(--sg-orange); }
+
+    /* ── Evidence exhibit ────────────────────────────── */
+    .sg-exhibit {
+      border: 1px solid var(--border);
+      background: #0e0f12;
+      margin-bottom: 18px;
+      transition: border-color 0.3s;
+      display: block;
+    }
+    .sg-exhibit:hover { border-color: rgba(255,122,26,0.55); }
+    .sg-exhibit img {
+      display: block;
+      width: 100%;
+      max-height: 520px;
+      object-fit: contain;
+      padding: 20px 20px 0;
+      box-sizing: border-box;
+    }
+    .sg-exhibit-cap {
+      display: flex; align-items: baseline; gap: 12px;
+      padding: 18px 22px 20px;
+    }
+    .sg-exhibit-tag {
+      font-family: var(--mono); font-size: 9.5px;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--sg-orange);
+      flex-shrink: 0;
+    }
+    .sg-exhibit-text {
+      font-size: 13.5px; line-height: 1.65;
+      color: rgba(255,255,255,0.62);
+    }
+    .sg-exhibit-text strong { color: #fff; }
+
+    .sg-charm-note {
+      padding: 24px 28px;
+      border: 1px solid rgba(232,23,79,0.3);
+      background: rgba(232,23,79,0.05);
+      margin-bottom: 64px;
+    }
+    .sg-charm-note-title {
+      font-family: var(--mono); font-size: 10px;
+      letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--sg-crimson);
+      margin-bottom: 10px;
+    }
+    .sg-charm-note p {
+      font-size: 14.5px; line-height: 1.75;
+      color: rgba(255,255,255,0.72);
+      margin: 0;
+    }
+    .sg-charm-note strong { color: #fff; }
+
+    /* ── Skill cards ─────────────────────────────────── */
+    .sg-skills {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 64px;
+    }
+    .sg-skill {
+      padding: 24px 26px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      border-left: 2px solid rgba(255,122,26,0.55);
+    }
+    .sg-skill-name {
+      font-family: var(--mono); font-size: 12px;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .sg-skill-desc {
+      font-size: 13.5px; line-height: 1.7;
+      color: rgba(255,255,255,0.6);
+    }
+
+    /* ── MMR ladder ──────────────────────────────────── */
+    .sg-ladder {
+      display: flex; flex-direction: column; gap: 8px;
+      margin-bottom: 14px;
+    }
+    .sg-rung {
+      display: flex; align-items: center; gap: 16px;
+      font-family: var(--mono); font-size: 11.5px;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--muted);
+    }
+    .sg-rung-name { width: 96px; flex-shrink: 0; text-align: right; }
+    .sg-rung-bar {
+      height: 26px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      display: flex; align-items: center;
+      padding: 0 12px;
+      font-size: 9.5px;
+      color: var(--dim);
+      white-space: nowrap;
+    }
+    .sg-rung-champ .sg-rung-name { color: var(--sg-crimson); font-weight: 500; }
+    .sg-rung-champ .sg-rung-bar {
+      background: linear-gradient(90deg, rgba(232,23,79,0.25), rgba(232,23,79,0.08));
+      border-color: rgba(232,23,79,0.55);
+      color: #ff9ab5;
+      box-shadow: 0 0 22px rgba(232,23,79,0.2);
+    }
+    .sg-ladder-note {
+      font-family: var(--mono); font-size: 10.5px;
+      color: var(--dim);
+      letter-spacing: 0.04em;
+      margin-bottom: 64px;
+    }
+
+    /* ── External link ───────────────────────────────── */
+    .sg-links { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 64px; }
+    .sg-link {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: var(--mono); font-size: 11px;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      padding: 10px 20px; border-radius: 999px;
+      border: 1px solid rgba(255,122,26,0.3);
+      background: rgba(255,122,26,0.07);
+      color: var(--sg-orange);
+      transition: background 0.2s, border-color 0.2s, color 0.2s;
+      text-decoration: none;
+    }
+    .sg-link:hover {
+      background: rgba(255,122,26,0.16);
+      border-color: rgba(255,122,26,0.55);
+      color: #fff;
+    }
+
+    @media (max-width: 860px) {
+      .sg-stats { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 760px) {
+      .sg-statement { flex-direction: column; text-align: center; gap: 24px; padding: 32px 24px; }
+      .sg-skills { grid-template-columns: 1fr; }
+      .sg-rung-name { width: 72px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="nav">
+    <a class="nav-logo" href="index.html" data-cursor="Home">SZ</a>
+    <div class="nav-links">
+      <a class="nav-link" href="work.html" data-cursor="Work">Work</a>
+      <a class="nav-link" href="experience.html" data-cursor="Experience">Experience</a>
+      <a class="nav-link" href="about.html" data-cursor="About">About</a>
+      <a class="nav-link" href="photos.html" data-cursor="Photos">Photos</a>
+      <a class="nav-link" href="contact.html" data-cursor="Contact">Contact</a>
+    </div>
+  </nav>
+
+  <main class="page-inner">
+
+    <!-- Hero -->
+    <section class="lamp-hero">
+      <div class="lamp-fx" aria-hidden="true">
+        <div class="lamp-cone lamp-cone-l"></div>
+        <div class="lamp-cone lamp-cone-r"></div>
+        <div class="lamp-glow"></div>
+        <div class="lamp-hotspot"></div>
+        <div class="lamp-bar"></div>
+      </div>
+      <h2 class="lamp-title">Champion</h2>
+      <span class="lamp-sub">Rainbow Six Siege · Operation Shifting Tides</span>
+    </section>
+
+    <!-- Rank statement -->
+    <div class="sg-statement sg-frame fade-up d2">
+      <span class="sg-corner" aria-hidden="true"></span>
+      <img class="sg-badge" src="image/logo-siege.png" alt="Rainbow Six Siege Champion rank emblem" height="125" />
+      <div>
+        <div class="sg-rank-name"><em>Champion</em></div>
+        <div class="sg-rank-sub">The highest rank in the game, gated at 5,000 MMR</div>
+        <div class="sg-rank-meta">After-action report · Y4S4 “Shifting Tides” · Dec 2019</div>
+      </div>
+    </div>
+
+    <!-- Rarity -->
+    <section>
+      <div class="section-label">[ Briefing / Rarity ]</div>
+      <h3 class="section-title">How rare is Champion?</h3>
+      <div class="sg-stats">
+        <div class="sg-stat reveal">
+          <div class="sg-stat-num">5000<span>+</span></div>
+          <div class="sg-stat-label">MMR required, the ladder's ceiling tier</div>
+        </div>
+        <div class="sg-stat reveal d1">
+          <div class="sg-stat-num">~0.2<span>%</span></div>
+          <div class="sg-stat-label">Of ranked players reach it in a season</div>
+        </div>
+        <div class="sg-stat reveal d2">
+          <div class="sg-stat-num">100</div>
+          <div class="sg-stat-label">Ranked matches minimum, no fluke runs</div>
+        </div>
+        <div class="sg-stat reveal d3">
+          <div class="sg-stat-num">1<span>/</span>7</div>
+          <div class="sg-stat-label">Top tier of seven, above Diamond</div>
+        </div>
+      </div>
+
+      <p class="sg-copy reveal">
+        Champion sits above Diamond as the terminal rank of Siege's ladder, and it is gated twice: you need <strong>5,000+ MMR</strong>, and you need <strong>at least 100 ranked matches</strong> in the season before the game will even award it. That second gate matters: it means Champion can't be a lucky streak. In a typical season only around <em>0.2% of the ranked population</em> clears both bars, putting it in the same rarity class as the top tiers of any competitive ladder.
+      </p>
+      <p class="sg-sources reveal">
+        sources: <a href="https://www.ubisoft.com/en-us/game/rainbow-six/siege/news-updates/4hShcX2HZTG2ttIi3IIN9Y/matchmaking-rating" target="_blank" rel="noopener">Ubisoft: Matchmaking Rating</a> · <a href="https://www.esportstales.com/rainbow-six-siege/seasonal-rank-distribution-and-percentage-of-players" target="_blank" rel="noopener">Esports Tales rank distribution</a>
+      </p>
+    </section>
+
+    <!-- Proof -->
+    <section>
+      <div class="section-label">[ Evidence ]</div>
+      <h3 class="section-title">Exhibit A: the Champion charm</h3>
+      <a class="sg-exhibit sg-frame reveal" href="image/siege1.jpg" target="_blank" rel="noopener" data-cursor="Open">
+        <span class="sg-corner" aria-hidden="true"></span>
+        <img src="image/siege1.jpg" alt="Rainbow Six Siege loadout screen showing the legendary Shifting Tides Champion charm, owned" loading="lazy" />
+        <div class="sg-exhibit-cap">
+          <span class="sg-exhibit-tag">Exhibit A /</span>
+          <span class="sg-exhibit-text">In-game loadout screen: <strong>“SHIFTING TIDES CHAMPION”</strong>, rarity <strong>Legendary</strong>, status <strong>Owned</strong>, equipped on the weapon.</span>
+        </div>
+      </a>
+      <div class="sg-charm-note reveal">
+        <div class="sg-charm-note-title">Why a charm is proof</div>
+        <p>Seasonal rank charms in Siege are <strong>awarded automatically at the end of a season, only at the rank you finished</strong>. The Shifting Tides Champion charm cannot be bought, traded, or earned any other way. Owning it is a permanent, in-game record that this account ended Y4S4 at Champion.</p>
+      </div>
+    </section>
+
+    <!-- What it demonstrates -->
+    <section>
+      <div class="section-label">[ Assessment ]</div>
+      <h3 class="section-title">One life per round. Every decision is final.</h3>
+      <p class="sg-copy reveal">
+        Siege is the slowest, most deliberate of the big tactical shooters: rounds are <strong>5v5 with no respawns</strong>, on maps where nearly every wall can be opened, reinforced, or shot through. Reaching the top of that ladder demonstrates a specific set of skills:
+      </p>
+      <div class="sg-skills">
+        <div class="sg-skill reveal">
+          <div class="sg-skill-name">Strategic depth</div>
+          <div class="sg-skill-desc">Destructible environments mean the map itself is a variable. Champion-level play requires knowing every sightline, soft wall, and rotation hole across a 20+ map pool, and how each changes as the round destroys it.</div>
+        </div>
+        <div class="sg-skill reveal d1">
+          <div class="sg-skill-name">Team coordination</div>
+          <div class="sg-skill-desc">Operator picks, utility timing, droning, and site executes only work when five people commit to one plan. You don't solo-carry your way to 5,000 MMR; you communicate your way there.</div>
+        </div>
+        <div class="sg-skill reveal d2">
+          <div class="sg-skill-name">Performing when it's final</div>
+          <div class="sg-skill-desc">One life per round means there is no second chance to correct a mistake. High-MMR Siege is sustained, careful decision-making where a single misread loses the round for the whole team.</div>
+        </div>
+        <div class="sg-skill reveal d3">
+          <div class="sg-skill-name">Endurance</div>
+          <div class="sg-skill-desc">The 100-match gate makes Champion a marathon: it certifies a top-fraction-of-a-percent level held across an entire season of matches, not a single good night.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Ladder -->
+    <section>
+      <div class="section-label">[ The climb ]</div>
+      <h3 class="section-title">The MMR ladder</h3>
+      <div class="sg-ladder reveal">
+        <div class="sg-rung sg-rung-champ">
+          <span class="sg-rung-name">Champion</span>
+          <div class="sg-rung-bar" style="width: min(100%, 560px)">5000+ MMR · 100 matches · ~0.2% of players</div>
+        </div>
+        <div class="sg-rung">
+          <span class="sg-rung-name">Diamond</span>
+          <div class="sg-rung-bar" style="width: min(88%, 480px)">4400 – 4999</div>
+        </div>
+        <div class="sg-rung">
+          <span class="sg-rung-name">Platinum</span>
+          <div class="sg-rung-bar" style="width: min(74%, 400px)">3200 – 4399</div>
+        </div>
+        <div class="sg-rung">
+          <span class="sg-rung-name">Gold</span>
+          <div class="sg-rung-bar" style="width: min(60%, 320px)">2600 – 3199</div>
+        </div>
+        <div class="sg-rung">
+          <span class="sg-rung-name">Silver</span>
+          <div class="sg-rung-bar" style="width: min(46%, 240px)">2100 – 2599</div>
+        </div>
+        <div class="sg-rung">
+          <span class="sg-rung-name">Bronze</span>
+          <div class="sg-rung-bar" style="width: min(32%, 165px)">1600 – 2099</div>
+        </div>
+        <div class="sg-rung">
+          <span class="sg-rung-name">Copper</span>
+          <div class="sg-rung-bar" style="width: min(20%, 100px)">&lt; 1600</div>
+        </div>
+      </div>
+      <p class="sg-ladder-note">MMR bands from the 2019-era ranked system, when Shifting Tides was live. Most of the player base never leaves Gold.</p>
+    </section>
+
+    <!-- Links -->
+    <div class="sg-links">
+      <a class="sg-link" href="https://r6.tracker.network/r6siege/profile/xbl/sPx1Lr/overview?gamemode=pvp_ranked" target="_blank" rel="noopener" data-cursor="Stats">
+        <span>Live stats on R6 Tracker</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+      </a>
+    </div>
+
+    <footer class="page-footer">
+      <span class="footer-copy">© <span id="year"></span> Steven Zhang</span>
+      <a class="footer-copy" href="about.html" data-cursor="About" style="text-decoration: none;">← About</a>
+    </footer>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
