@@ -722,9 +722,11 @@ button { font-family: inherit; }
   padding: 0 0 44px 36px;
   position: relative;
 }
+/* Fallback marker: hollow dot centered on the rail
+   (rail = .timeline border-left; item edge sits 29px right of it) */
 .tl-item::before {
   content: '';
-  position: absolute; left: -5px; top: 7px;
+  position: absolute; left: -33px; top: 7px;
   width: 9px; height: 9px; border-radius: 50%;
   background: var(--bg);
   border: 1px solid rgba(255, 255, 255, 0.3);
@@ -732,6 +734,24 @@ button { font-family: inherit; }
 .tl-item:first-child::before {
   border-color: var(--accent);
   box-shadow: 0 0 12px rgba(124, 92, 255, 0.5);
+}
+/* Logo tile marker (LinkedIn-style) replaces the dot when present */
+.tl-item.has-logo::before { display: none; }
+.tl-logo {
+  position: absolute; left: -53px; top: 0;
+  width: 48px; height: 48px; padding: 6px;
+  border-radius: 8px;
+  background: #f4f4f5;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+.tl-logo img {
+  width: 100%; height: 100%;
+  object-fit: contain;
+  display: block;
+}
+.tl-item:first-child .tl-logo {
+  box-shadow: 0 0 0 1px var(--accent), 0 0 12px rgba(124, 92, 255, 0.5);
 }
 .tl-date {
   font-family: var(--mono); font-size: 10.5px;
@@ -1284,6 +1304,9 @@ a.ci-val:hover { color: var(--accent2); }
   .stat:last-child { border-bottom: none; }
   .contact-grid { grid-template-columns: 1fr; }
   .skills-grid { grid-template-columns: 1fr; }
+  .timeline { margin-left: 12px; }
+  .tl-item { padding-left: 28px; }
+  .tl-logo { width: 40px; height: 40px; padding: 5px; left: -49px; }
   .album-grid { grid-template-columns: 1fr 1fr; }
 }
 @media (max-width: 540px) {
