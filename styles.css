@@ -1018,6 +1018,12 @@ a.ci-val:hover { color: var(--accent2); }
   border-color: rgba(255, 255, 255, 0.3);
   background: var(--surface);
 }
+.cbtn-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+}
+.cbtn-icon svg { flex: none; }
 
 /* ============================================================
    PHOTOS
