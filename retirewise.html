@@ -42,6 +42,15 @@
       color: #fff;
     }
 
+    .proj-links + .demo-note { margin-top: -36px; }
+    .demo-note {
+      font-family: var(--mono); font-size: 11px;
+      letter-spacing: 0.04em;
+      color: rgba(255,255,255,0.45);
+      margin-bottom: 48px;
+    }
+    .demo-note code { color: rgba(255,255,255,0.8); font-family: inherit; }
+
     .proj-concepts {
       display: flex; flex-wrap: wrap; gap: 10px;
       margin-bottom: 56px;
@@ -129,6 +138,7 @@
       line-height: 1.6;
       color: rgba(255,255,255,0.6);
     }
+    .feat-desc code { font-family: var(--mono); font-size: 12px; color: rgba(255,255,255,0.8); }
 
     /* ── Contributions list ──────────────────────────── */
     .contrib-list {
@@ -155,8 +165,40 @@
       font-weight: 600;
     }
 
+    /* ── Screenshots ─────────────────────────────────── */
+    .shot-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 48px;
+    }
+    .shot {
+      margin: 0;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--surface);
+      overflow: hidden;
+    }
+    .shot a { display: block; }
+    .shot img {
+      display: block;
+      width: 100%; height: auto;
+      aspect-ratio: 2 / 1;
+      object-fit: cover; object-position: top left;
+      transition: transform 0.4s ease;
+    }
+    .shot a:hover img { transform: scale(1.02); }
+    .shot figcaption {
+      padding: 12px 16px;
+      font-family: var(--mono); font-size: 11px;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      color: rgba(255,255,255,0.55);
+      border-top: 1px solid var(--border);
+    }
+
     @media (max-width: 760px) {
       .feat-grid { grid-template-columns: 1fr; }
+      .shot-grid { grid-template-columns: 1fr; }
       .arch { flex-direction: column; gap: 8px; }
       .arch-arrow { transform: rotate(90deg); padding: 4px 0; }
     }
@@ -202,7 +244,12 @@
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
           <span>View on GitHub</span>
         </a>
+        <a class="proj-link" href="https://retirement-web-production.up.railway.app" target="_blank" rel="noopener" data-cursor="Demo">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><path d="M15 3h6v6"/><path d="M10 14L21 3"/></svg>
+          <span>Live Demo</span>
+        </a>
       </div>
+      <p class="demo-note">Demo login: <code>demo@example.com</code> / <code>password123</code></p>
 
       <div class="proj-concepts">
         <span class="proj-chip">Angular 19</span>
@@ -215,6 +262,8 @@
         <span class="proj-chip">JWT Auth</span>
         <span class="proj-chip">Docker</span>
         <span class="proj-chip">Flyway</span>
+        <span class="proj-chip">Nginx</span>
+        <span class="proj-chip">Railway</span>
       </div>
     </section>
 
@@ -225,7 +274,7 @@
       <div class="arch">
         <div class="arch-stage">
           <span class="arch-stage-name">Angular</span>
-          <span class="arch-stage-desc">JWT Interceptor, Auth Guard, Chart.js</span>
+          <span class="arch-stage-desc">JWT Interceptor, Auth Guard, Chart.js, served by Nginx</span>
         </div>
         <span class="arch-arrow">HTTP/REST &rarr;</span>
         <div class="arch-stage">
@@ -237,6 +286,30 @@
           <span class="arch-stage-name">PostgreSQL</span>
           <span class="arch-stage-desc">Persistent storage</span>
         </div>
+      </div>
+    </section>
+
+    <!-- Screenshots -->
+    <section>
+      <div class="section-label">Screenshots</div>
+      <h3 class="section-title">In the App</h3>
+      <div class="shot-grid">
+        <figure class="shot reveal">
+          <a href="image/retirewise/dashboard.webp" target="_blank" rel="noopener" data-cursor="Open"><img src="image/retirewise/dashboard.webp" alt="RetireWise dashboard with balance, YTD contributions, balance-over-time chart, and asset allocation doughnut" loading="lazy" /></a>
+          <figcaption>Dashboard</figcaption>
+        </figure>
+        <figure class="shot reveal d1">
+          <a href="image/retirewise/contributions.webp" target="_blank" rel="noopener" data-cursor="Open"><img src="image/retirewise/contributions.webp" alt="Paginated contribution history table with employee and employer amounts" loading="lazy" /></a>
+          <figcaption>Contribution History</figcaption>
+        </figure>
+        <figure class="shot reveal d2">
+          <a href="image/retirewise/add-contribution.webp" target="_blank" rel="noopener" data-cursor="Open"><img src="image/retirewise/add-contribution.webp" alt="Add Contribution modal with date, employee and employer amounts, and pay period" loading="lazy" /></a>
+          <figcaption>Add Contribution</figcaption>
+        </figure>
+        <figure class="shot reveal d3">
+          <a href="image/retirewise/projections.webp" target="_blank" rel="noopener" data-cursor="Open"><img src="image/retirewise/projections.webp" alt="Retirement projections calculator with growth curve chart" loading="lazy" /></a>
+          <figcaption>Retirement Projections</figcaption>
+        </figure>
       </div>
     </section>
 
@@ -266,7 +339,15 @@
         </div>
         <div class="feat-card reveal d5">
           <div class="feat-name">Database Migrations</div>
-          <div class="feat-desc">Flyway-managed schema migrations with PostgreSQL 16, JPA/JDBC persistence layer, and Docker Compose for local development.</div>
+          <div class="feat-desc">Flyway-managed schema migrations with PostgreSQL 16, JPA/JDBC persistence layer, and Docker Compose for local development. Demo seed data is isolated behind a Spring <code>demo</code> profile, so production starts with a clean database.</div>
+        </div>
+        <div class="feat-card reveal d6">
+          <div class="feat-name">Cloud Deployment</div>
+          <div class="feat-desc">Live on Railway as separate frontend, backend, and database services. Nginx proxies <code>/api</code> to the backend over Railway's IPv6 private network, re-resolving DNS at runtime so redeploys never break the upstream.</div>
+        </div>
+        <div class="feat-card reveal d7">
+          <div class="feat-name">Environment-Driven Config</div>
+          <div class="feat-desc">No insecure defaults: the API fails fast at startup if the JWT secret or database password is missing. CORS origins and the API proxy target are read from the environment, with a documented <code>.env.example</code>.</div>
         </div>
       </div>
     </section>
@@ -281,7 +362,8 @@
         <li>Built the <strong>Spring Boot 3 REST API</strong> with Java 17 — account endpoints, contribution CRUD, and projection calculations</li>
         <li>Engineered <strong>JWT authentication</strong> with access + refresh tokens, BCrypt hashing, and role-based access control via Spring Security</li>
         <li>Set up <strong>PostgreSQL 16 with Flyway migrations</strong>, Docker Compose for local dev, and GitHub Actions CI/CD pipeline</li>
-        <li>Applied <strong>security hardening</strong> — XSS/clickjacking headers, input validation via Jakarta Bean Validation, and CORS configuration</li>
+        <li>Applied <strong>security hardening</strong> — XSS/clickjacking headers, input validation via Jakarta Bean Validation, environment-configured CORS, and removal of all hardcoded secret fallbacks</li>
+        <li>Deployed the full stack to <strong>Railway</strong> with a templated Nginx config whose API proxy target and resolver flags are set per environment, making the same image run locally and on IPv6-only private networking</li>
       </ul>
     </section>
 
